@@ -1,8 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { storeImageToStorage } from "@/actions/storage";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import CustomizationFields from "./customization-fields";
@@ -37,13 +39,17 @@ const UploadPage = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: any) => {
+  const [uploading, setUploading] = useState<boolean>(false);
+
+  const onSubmit = async (data: any) => {
+    setUploading(true);
     console.log(data);
     const reader = new FileReader();
-    reader.onloadend = () => {
-      /* TODO: Store uploaded image to file storage and retrieve its filepath. */
-      const base64 = reader.result;
-      /* upload to file storage here */
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      /* TODO: Insert row to upload table using the image URL. */
+      const publicURL = await storeImageToStorage(base64);
+      console.log(publicURL);
       /* END TODO */
     };
     reader.readAsDataURL(data.uploadedImage[0]);
@@ -62,9 +68,9 @@ const UploadPage = () => {
               <ImageUploader />
               <CustomizationFields />
             </div>
-            <Button variant='outline' type='submit'>
+            <LoadingButton loading={uploading} variant='outline' type='submit'>
               一鍵成為穿搭達人！
-            </Button>
+            </LoadingButton>
           </div>
         </form>
       </FormProvider>
