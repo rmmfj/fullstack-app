@@ -9,6 +9,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import CustomizationFields from "./customization-fields";
 import ImageUploader from "./image-uploader";
+import { handleSubmission } from "@/actions/submission-handling";
+import { ImageURL } from "openai/resources/beta/threads/messages";
+import { storeImageToStorage } from "@/actions/storage";
 
 const schema = z.object({
   clothingType: z.enum(["upper", "lower"], {
@@ -33,23 +36,20 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const UploadPage = () => {
+const UploadPage = async () => {
   const router = useRouter();
   const methods = useForm({
     resolver: zodResolver(schema),
   });
 
-  const [uploading, setUploading] = useState<boolean>(false);
 
   const onSubmit = async (data: any) => {
-    setUploading(true);
     console.log(data);
     const reader = new FileReader();
-    reader.onloadend = async () => {
+    reader.onloadend = () => {
+      /* TODO: Store uploaded image to file storage and retrieve its filepath. */
       const base64 = reader.result as string;
-      /* TODO: Insert row to upload table using the image URL. */
-      const publicURL = await storeImageToStorage(base64);
-      console.log(publicURL);
+      /* upload to file storage here */
       /* END TODO */
     };
     reader.readAsDataURL(data.uploadedImage[0]);

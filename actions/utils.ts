@@ -1,11 +1,8 @@
 // utils.ts
-import OpenAI from 'openai';
+import openai from "@/utils/openai";
+import { ImageURL } from "openai/resources/beta/threads/messages";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
-const chatCompletionTextAndImage = async (model: string, prompt: string, image_url: string): Promise<string | null> => {
+const chatCompletionTextAndImage = async (model: string, prompt: string, image_url: ImageURL): Promise<string | null> => {
     /* TODO: Using OpenAI API to get your response with a text and an image input.
        This server action purely takes your input and sends to GPT model to get your response. */
     try {
