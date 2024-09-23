@@ -59,7 +59,7 @@ export default function EditUsernameDialog({
           </div>
           <DialogFooter>
             <Button variant='outline' type='submit'>
-              Save changes
+              儲存變更
             </Button>
           </DialogFooter>
         </form>
