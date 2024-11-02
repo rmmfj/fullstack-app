@@ -18,20 +18,53 @@ const base64ToBlob = (base64: string): Blob => {
   return new Blob([ab], { type: mimeString });
 };
 
-const storeImageToStorage = async (base64: string) => {
+// const storeImageToStorage = async (base64: string) => {
+//   console.time("storeImageToStorage");
+//   const blob: Blob = base64ToBlob(base64);
+//   const filename = `image-${uuidv4()}`;
+//   await supabase.storage.from("image").upload(filename, blob, {
+//     cacheControl: "3600",
+//     upsert: false,
+//   });
+//   const {
+//     data: { publicUrl },
+//   } = supabase.storage.from("image").getPublicUrl(filename);
+//   console.timeEnd("storeImageToStorage");
+//   return publicUrl;
+// };
+
+const storeImageToStorage = async (base64: string, filename: string) => {
   console.time("storeImageToStorage");
-  const blob: Blob = base64ToBlob(base64);
-  const filename = `image-${uuidv4()}`;
-  await supabase.storage.from("image").upload(filename, blob, {
-    cacheControl: "3600",
-    upsert: false,
-  });
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("image").getPublicUrl(filename);
-  console.timeEnd("storeImageToStorage");
-  return publicUrl;
+
+  const blob = base64ToBlob(base64); // Convert base64 to Blob
+  const formData = new FormData();
+  formData.append("file", blob, filename); // Use the original filename
+
+  const imageSourceUrl = process.env.IMAGE_SOURCE_URL;
+  console.log(imageSourceUrl);
+  try {
+    // Replace Supabase call with a POST request to your Flask API on port 8086
+    const response = await fetch(`${imageSourceUrl}/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to upload image: ${response.statusText}`);
+    }
+    const result = await response.json();
+    console.log("testing response", response);
+    console.timeEnd("storeImageToStorage");
+    console.log(`Image uploaded successfully with ID: ${result.id}`)
+    // Return the image URL from the server response
+    return result.url;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    console.timeEnd("storeImageToStorage");
+    return null;
+  }
 };
+
 
 // Inserts results into the database
 const insertResults = async (
