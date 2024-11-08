@@ -228,8 +228,7 @@ const handleTextSearch = async (
             page,
             user_id
           });
-        if(searchResult)
-          console.log("First series_id:", searchResult.series[0].items[0].series_id);
+
         return searchResult;
       } else {
         console.error("No valid labels found after cleaning");
