@@ -82,6 +82,7 @@ model Profile {
   activity_items         UserActivityItem[]
   activity_recommendations UserActivityRecommendation[]
   activity_suggestions   UserActivitySuggestion[]
+  favorites  Favorite[]
 
   @@index([username])
 
@@ -206,3 +207,15 @@ model UserActivitySuggestion {
   @@map("user_activity_suggestion")
 }
 
+model Favorite {
+  user_id    String
+  series_id  String
+  
+  Profile    Profile?   @relation(fields: [user_id], references: [user_id], onUpdate: Cascade, onDelete: NoAction)
+
+  @@id([user_id, series_id])
+  @@index([user_id])
+  @@index([series_id])
+
+  @@map("favorite")
+}

@@ -8,15 +8,18 @@ export type SuggestionTable = Suggestion;
 export type UploadTable = Upload;
 export type ResultTable = Result;
 export type ProfileTable = Profile;
+export type FavoriteTable = Favorite;
 
 export type SimplifiedItemTable = Omit<Item, 'embedding'>;
 export type Series = { items: SimplifiedItemTable[] };
+
+export type SeriesWithFavorite = { items: SimplifiedItemTable[], isFavorite: boolean };
 
 export interface Recommendation {
   param: ParamTable;
   upload: UploadTable;
   styles: {
-    [styleName: string]: { series: Series[], description: string };
+    [styleName: string]: { series: SeriesWithFavorite[], description: string };
   };
 }
 
@@ -30,10 +33,22 @@ export interface RecommendationWithoutLogin {
   };
 }
 
-export interface SearchResult {
+// export interface SearchResult {
+//   series: SeriesWithFavorite[];
+//   totalPage: number;
+// }
+
+type SearchResultWithFavorite = {
+  series: SeriesWithFavorite[];
+  totalPage: number;
+};
+
+type SearchResultWithoutFavorite = {
   series: Series[];
   totalPage: number;
-}
+};
+
+type SearchResult = user_id extends string ? SearchResultWithFavorite : SearchResultWithoutFavorite;
 
 export type RecommendationPreview = Recommendation & {
   upload: UploadTable;

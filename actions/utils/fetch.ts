@@ -8,7 +8,8 @@ import {
   SuggestionTable,
   UploadTable,
   Series,
-  SimplifiedItemTable
+  SimplifiedItemTable,
+  SeriesWithFavorite
 } from "@/type";
 import { handleDatabaseError } from '../activity';
 
@@ -150,7 +151,7 @@ const getSeriesByIdsForSearching = async (
   series_ids: string[],
   originalItemIds: string[],
   gender: string,
-): Promise<Series[] | null> => {
+): Promise<Series[]|SeriesWithFavorite[] | null> => {
   try {
     console.time("getSeriesByIdsForSearching");
     const matViewName = gender === "neutral" ? "all_item_matview" : `${gender}_item_matview`;
@@ -197,7 +198,8 @@ const getSeriesForRecommendation = async (
   series_ids: string[],
   originalItemIds: string[],
   gender: string,
-  clothingType: string
+  clothingType: string,
+  user_id: string,
 ): Promise<Series[] | null> => {
   try {
     console.time("getSeriesForRecommendation");
@@ -220,6 +222,13 @@ const getSeriesForRecommendation = async (
         continue;
       }
 
+      const isFavorite = await prisma.favorite.findFirst({
+        where: {
+          user_id: user_id,
+          series_id: seriesId,
+        },
+      }) !== null;
+
       const originalItems = data.filter(item => originalItemIds.includes(item.id));
       const otherItems = data.filter(item => !originalItemIds.includes(item.id));
 
@@ -231,8 +240,9 @@ const getSeriesForRecommendation = async (
         price: item.price ? Number(item.price) : 0,
       }));
 
-      const series: Series = {
+      const series: SeriesWithFavorite = {
         items: sortedItems,
+        isFavorite
       };
       seriesArray.push(series);
     }

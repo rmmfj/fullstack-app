@@ -1,10 +1,12 @@
 "use server";
-import { SearchResult, Series, SimplifiedItemTable, UnstoredResult, ClothingType, Gender, ItemTable } from "@/type";
+import { SearchResult, Series, SimplifiedItemTable, UnstoredResult, ClothingType, Gender, ItemTable, SeriesWithFavorite } from "@/type";
 import { getSeriesByIdsForSearching } from "./fetch";
 import { generateEmbedding } from "./embedding";
 import prisma from "@/prisma/db";
 import { handleDatabaseError } from "../activity";
+import { isFavorite } from "../favorite";
 
+//recommendation
 const vectorSearchForRecommendation = async (
   suggestedLabelString: string,
   numMaxItem: number,
@@ -37,87 +39,6 @@ const vectorSearchForRecommendation = async (
     return series;
   } catch (error) {
     handleDatabaseError(error, "vectorSearchForRecommendation");
-    return null;
-  }
-};
-
-const vectorSearchForSearching = async (
-  suggestedLabelString: string,
-  page: number,
-  pageSize: number,
-  gender: Gender,
-  priceLowerBound?: number,
-  priceUpperBound?: number,
-  providers?: string[],
-  clothingType?: ClothingType,
-): Promise<{ series: Series[]; totalItems: number } | null> => {
-  try {
-    //setting the mat view
-    const suggestedEmbedding = await generateEmbedding(suggestedLabelString);
-    const matchThreshold = -0.9;
-    let genderString = gender === "neutral" ? "all" : gender;
-    const viewName = `${genderString}_item_matview`;
-    const offset = (page - 1) * pageSize;
-
-    //setting the filters
-    let filterConditions = `${viewName}.embedding <#> $1::vector > $2`;
-    const queryParams: any[] = [suggestedEmbedding, matchThreshold];
-    let paramIndex = 3;
-
-    if (priceLowerBound !== undefined) {
-      filterConditions += ` AND price >= $${paramIndex++}`;
-      queryParams.push(priceLowerBound);
-    }
-    if (priceUpperBound !== undefined) {
-      filterConditions += ` AND price <= $${paramIndex++}`;
-      queryParams.push(priceUpperBound);
-    }
-    if (providers && providers.length > 0) {
-      const providerPlaceholders = providers.map((_, index) => `$${paramIndex + index}`).join(", ");
-      filterConditions += ` AND provider IN (${providerPlaceholders})`;
-      queryParams.push(...providers);
-      paramIndex += providers.length;
-    }
-    if (clothingType) {
-      filterConditions += ` AND clothing_type = $${paramIndex++}`;
-      queryParams.push(clothingType);
-    }
-
-    const countQuery = `
-      SELECT COUNT(*) AS total_count
-      FROM ${viewName}
-      WHERE ${filterConditions}
-      GROUP BY embedding
-      ORDER BY ${viewName}.embedding <#> $1::vector ASC
-    `;
-
-    const totalItemsResult = await prisma.$queryRawUnsafe<{ total_count: bigint }[]>(countQuery, ...queryParams);
-    // console.log("Similarity results: ", totalItemsResult);
-
-    const totalItems = totalItemsResult.reduce((sum, item) => sum + Number(item.total_count), 0);
-    // console.log("query total count: ", totalItems);
-
-    const mainQuery = `
-      SELECT id, clothing_type, color, external_link, gender, image_url, label_string, price, provider, series_id, title
-      FROM ${viewName}
-      WHERE ${filterConditions}
-      ORDER BY ${viewName}.embedding <#> $1::vector ASC
-      LIMIT $${paramIndex++} OFFSET $${paramIndex};
-    `;
-    const mainQueryParams = [...queryParams, pageSize, offset];
-
-    const items: SimplifiedItemTable[] = await prisma.$queryRawUnsafe(mainQuery, ...mainQueryParams);
-
-    const series: Series[] = items.map(simplifiedItem => ({
-      items: [{
-        ...simplifiedItem,
-        price: simplifiedItem.price ? Number(simplifiedItem.price) : 0,
-      }],
-    }));
-
-    return { series, totalItems };
-  } catch (error) {
-    handleDatabaseError(error, "vectorSearchForSearching");
     return null;
   }
 };
@@ -220,6 +141,89 @@ const semanticSearchWithoutLogin = async ({
   }
 };
 
+//searching
+const vectorSearchForSearching = async (
+  suggestedLabelString: string,
+  page: number,
+  pageSize: number,
+  gender: Gender,
+  priceLowerBound?: number,
+  priceUpperBound?: number,
+  providers?: string[],
+  clothingType?: ClothingType,
+): Promise<{ series: Series[]; totalItems: number } | null> => {
+  try {
+    //setting the mat view
+    const suggestedEmbedding = await generateEmbedding(suggestedLabelString);
+    const matchThreshold = -0.9;
+    let genderString = gender === "neutral" ? "all" : gender;
+    const viewName = `${genderString}_item_matview`;
+    const offset = (page - 1) * pageSize;
+
+    //setting the filters
+    let filterConditions = `${viewName}.embedding <#> $1::vector > $2`;
+    const queryParams: any[] = [suggestedEmbedding, matchThreshold];
+    let paramIndex = 3;
+
+    if (priceLowerBound !== undefined) {
+      filterConditions += ` AND price >= $${paramIndex++}`;
+      queryParams.push(priceLowerBound);
+    }
+    if (priceUpperBound !== undefined) {
+      filterConditions += ` AND price <= $${paramIndex++}`;
+      queryParams.push(priceUpperBound);
+    }
+    if (providers && providers.length > 0) {
+      const providerPlaceholders = providers.map((_, index) => `$${paramIndex + index}`).join(", ");
+      filterConditions += ` AND provider IN (${providerPlaceholders})`;
+      queryParams.push(...providers);
+      paramIndex += providers.length;
+    }
+    if (clothingType) {
+      filterConditions += ` AND clothing_type = $${paramIndex++}`;
+      queryParams.push(clothingType);
+    }
+
+    const countQuery = `
+      SELECT COUNT(*) AS total_count
+      FROM ${viewName}
+      WHERE ${filterConditions}
+      GROUP BY embedding
+      ORDER BY ${viewName}.embedding <#> $1::vector ASC
+    `;
+
+    const totalItemsResult = await prisma.$queryRawUnsafe<{ total_count: bigint }[]>(countQuery, ...queryParams);
+    // console.log("Similarity results: ", totalItemsResult);
+
+    const totalItems = totalItemsResult.reduce((sum, item) => sum + Number(item.total_count), 0);
+    // console.log("query total count: ", totalItems);
+
+    const mainQuery = `
+      SELECT id, clothing_type, color, external_link, gender, image_url, label_string, price, provider, series_id, title
+      FROM ${viewName}
+      WHERE ${filterConditions}
+      ORDER BY ${viewName}.embedding <#> $1::vector ASC
+      LIMIT $${paramIndex++} OFFSET $${paramIndex};
+    `;
+    const mainQueryParams = [...queryParams, pageSize, offset];
+
+    const items: SimplifiedItemTable[] = await prisma.$queryRawUnsafe(mainQuery, ...mainQueryParams);
+
+    const series: Series[] = items.map(simplifiedItem => ({
+      items: [{
+        ...simplifiedItem,
+        price: simplifiedItem.price ? Number(simplifiedItem.price) : 0,
+      }],
+    }));
+
+    return { series, totalItems };
+  } catch (error) {
+    handleDatabaseError(error, "vectorSearchForSearching");
+    return null;
+  }
+};
+
+
 const semanticSearchForSearching = async ({
   suggestedLabelString,
   gender,
@@ -228,6 +232,7 @@ const semanticSearchForSearching = async ({
   providers,
   clothingType,
   page,
+  user_id
 }: {
   suggestedLabelString: string;
   gender: Gender;
@@ -236,6 +241,7 @@ const semanticSearchForSearching = async ({
   providers?: string[];
   clothingType?: ClothingType;
   page: number;
+  user_id?: string
 }): Promise<SearchResult | null> => {
   try {
     const searchResultData = await vectorSearchForSearching(
@@ -246,7 +252,7 @@ const semanticSearchForSearching = async ({
       priceLowerBound,
       priceUpperBound,
       providers,
-      clothingType
+      clothingType,
     );
 
     if (!searchResultData || searchResultData.series.length === 0) {
@@ -269,15 +275,26 @@ const semanticSearchForSearching = async ({
       }
     }
     const similarItemIds = series.flatMap(seriesItem => seriesItem.items.map(item => item.id));
+    
+    let seriesArray: Series[] | SeriesWithFavorite[] = await getSeriesByIdsForSearching(uniqueSeriesIds, similarItemIds, gender) || [];
 
-    const seriesArray = await getSeriesByIdsForSearching(uniqueSeriesIds, similarItemIds, gender);
-    const safeSeriesArray: Series[] = seriesArray || [];
+    if (user_id !== undefined) {
+      seriesArray = await Promise.all(
+        seriesArray.map(async (s) => ({
+          ...s,
+          isFavorite: await isFavorite(user_id, s.items[0].series_id)
+      }))
+    );
+    return {
+      series: seriesArray as SeriesWithFavorite[],
+      totalPage
+      } as SearchResult;
+    }
+    return {
+    series: seriesArray as Series[],
+    totalPage
+    } as SearchResult;
 
-    const searchResult: SearchResult = {
-      series: safeSeriesArray,
-      totalPage,
-    };
-    return searchResult;
   } catch (error) {
     handleDatabaseError(error, "semanticSearchForSearching");
     return null;

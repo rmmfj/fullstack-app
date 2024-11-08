@@ -142,7 +142,8 @@ const handleImageSearch = async (
   priceLowerBound?: number,
   priceUpperBound?: number,
   providers?: string[],
-  clothingType?: ClothingType
+  clothingType?: ClothingType,
+  user_id?: string,
 ): Promise<SearchResult | null> => {
   try {
     const prompt: string = constructPromptForImageSearch({
@@ -168,6 +169,7 @@ const handleImageSearch = async (
           providers,
           clothingType,
           page,
+          user_id,
         });
         console.log("searchResult: ", searchResult);
         return searchResult;
@@ -194,6 +196,7 @@ const handleTextSearch = async (
   priceUpperBound?: number,
   providers?: string[],
   clothingType?: ClothingType,
+  user_id?: string,
 ): Promise<SearchResult | null> => {
   try {
     const prompt: string = constructPromptForTextSearch({
@@ -223,7 +226,10 @@ const handleTextSearch = async (
             providers,
             clothingType,
             page,
+            user_id
           });
+        if(searchResult)
+          console.log("First series_id:", searchResult.series[0].items[0].series_id);
         return searchResult;
       } else {
         console.error("No valid labels found after cleaning");

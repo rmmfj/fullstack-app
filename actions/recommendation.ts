@@ -5,6 +5,7 @@ import {
   RecommendationTable,
   ResultTable,
   Series,
+  SeriesWithFavorite,
   SuggestionTable,
   UploadTable,
 } from "@/type";
@@ -55,7 +56,7 @@ const getRecommendationRecordById = async (
 
       const gender = recommendation_record.param?.gender ?? "neutral";
       const clothingType = recommendation_record.param?.clothing_type ?? "top";
-      const series = (await getSeriesForRecommendation(series_ids, item_ids, gender, clothingType)) as Series[];
+      const series = (await getSeriesForRecommendation(series_ids, item_ids, gender, clothingType, user_id)) as SeriesWithFavorite[];
       if (!series) throw new Error("No series found");
 
       recommendation_record.styles![styleName] = {
