@@ -19,20 +19,42 @@ const base64ToBlob = (base64: string): Blob => {
   return new Blob([ab], { type: mimeString });
 };
 
-const storeImageToStorage = async (base64: string) => {
+const storeImageToStorage = async (base64: string, filename: string) => {
   console.time("storeImageToStorage");
+
+  // Convert base64 to Blob
   const blob: Blob = base64ToBlob(base64);
-  const filename = `image-${uuidv4()}`;
-  await supabase.storage.from("image").upload(filename, blob, {
-    cacheControl: "3600",
-    upsert: false,
-  });
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("image").getPublicUrl(filename);
-  console.timeEnd("storeImageToStorage");
-  return publicUrl;
+
+  // Create a FormData object to send the file
+  const formData = new FormData();
+  formData.append("file", blob, filename);
+
+  try {
+    // Send the image to the image server
+    const response = await fetch("https://clothing.rfjmm.com/upload", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${process.env.IMAGE_SERVER_ACCESS_SECRET}`, // Replace with your shared secret
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to upload image: ${response.statusText}`);
+    }
+
+    // Parse the JSON response
+    const result = await response.json();
+
+    console.timeEnd("storeImageToStorage");
+    return result.url; // Return the URL to access the image
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    console.timeEnd("storeImageToStorage");
+    throw error;
+  }
 };
+
 
 // Inserts results into the database
 const insertResults = async (
