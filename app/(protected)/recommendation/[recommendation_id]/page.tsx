@@ -12,7 +12,7 @@ const RecommendationPage = async ({
   params,
   searchParams,
 }: {
-  params: { recommendation_id: string };
+  params: { recommendation_id: number };
   searchParams?: { [key: string]: string | undefined };
   }) => {
   const supabase = createClient();
