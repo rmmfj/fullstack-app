@@ -11,14 +11,14 @@ import { Metadata } from "next";
 import { ReactElement } from "react";
 
 interface RecommendationPageProps {
-  params: { recommendation_id: string };
-  searchParams?: { [key: string]: string | undefined };
+  params: Promise<{ recommendation_id: string }>;
+  searchParams?: Promise<{ [key: string]: string | undefined }>;
 }
 
-const RecommendationPage: React.FC<RecommendationPageProps> = async ({
+const RecommendationPage = async ({
   params,
   searchParams,
-}): Promise<ReactElement> => {
+}: RecommendationPageProps) => {
   const supabase = createClient();
   // Get the user data
   const {
