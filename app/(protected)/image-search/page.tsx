@@ -55,8 +55,9 @@ export default function ImageSearch() {
     reader.onloadend = async () => {
       if (typeof reader.result === "string") {
         const base64 = reader.result;
+        const filename = file.name;
         try {
-          const imageUrl = await storeImageToStorage(base64);
+          const imageUrl = await storeImageToStorage(base64, filename);
           /* TODO: Perform image search with the image uarl */
           setUploadedImageUrl(imageUrl);
           setImageUploading(false);
