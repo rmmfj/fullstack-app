@@ -1,13 +1,11 @@
 version: '3.9'
 services:
   app:
-    image: node:20
-    container_name: outfit-recommendation-app
-    working_dir: /
-    volumes:
-      - .:/app
+    build:
+      context: .
+      dockerfile: dockerfile
     ports:
       - "3000:3000"
     env_file:
       - .env.local
-    command: bash -c "yarn && yarn build && yarn start"
+    restart: always
