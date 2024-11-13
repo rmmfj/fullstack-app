@@ -7,14 +7,18 @@ import { Recommendation } from "@/type";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import UserInfoCard from "./user-info-card";
+import { Metadata } from "next";
+import { ReactElement } from "react";
 
-const RecommendationPage = async ({
-  params,
-  searchParams,
-}: {
+interface RecommendationPageProps {
   params: { recommendation_id: string };
   searchParams?: { [key: string]: string | undefined };
-}) => {
+}
+
+const RecommendationPage: React.FC<RecommendationPageProps> = async ({
+  params,
+  searchParams,
+}): Promise<ReactElement> => {
   const supabase = createClient();
   // Get the user data
   const {
