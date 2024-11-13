@@ -11,14 +11,15 @@ import { Metadata } from "next";
 import { ReactElement } from "react";
 
 interface RecommendationPageProps {
-  params: { recommendation_id: string };
-  searchParams?: { [key: string]: string | undefined };
+  params: Promise<{ recommendation_id: string }>;
+  searchParams?: Promise<{ [key: string]: string | undefined }>;
 }
 
 const RecommendationPage = async ({
   params,
   searchParams,
 }: RecommendationPageProps) => {
+  const { recommendation_id } = await params;
   const supabase = createClient();
   // Get the user data
   const {
@@ -26,7 +27,7 @@ const RecommendationPage = async ({
     error,
   } = await supabase.auth.getUser();
   const recommendation: Recommendation = (await getRecommendationRecordById(
-    parseInt(params.recommendation_id),
+    parseInt(recommendation_id),
     user?.id as string
   )) as Recommendation;
   if (!recommendation)

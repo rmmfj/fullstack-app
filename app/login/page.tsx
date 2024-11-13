@@ -5,11 +5,16 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 
-export default function Login({
+export default async function Login({
   searchParams,
 }: {
-  searchParams: { message: string };
+  searchParams: Promise<{ message?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
+  const headersObject = await headers();
+
+  const origin = headersObject.get("origin");
+
   const signIn = async (formData: FormData) => {
     "use server";
 
@@ -30,7 +35,7 @@ export default function Login({
   const signUp = async (formData: FormData) => {
     "use server";
 
-    const origin = headers().get("origin");
+    // const origin = headers().get("origin");
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
@@ -74,9 +79,9 @@ export default function Login({
           placeholder='••••••••'
           required
         />
-        {searchParams?.message && (
+        {resolvedSearchParams?.message && (
           <p className='mt-4 p-4 bg-foreground/10 text-foreground text-center'>
-            {searchParams.message}
+            {resolvedSearchParams.message}
           </p>
         )}
         <SubmitButton
