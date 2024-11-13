@@ -1,11 +1,15 @@
 version: '3.9'
 services:
-  app:
+  outfit-app:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: dockerfile  # Match the lowercase name in your structure
+    container_name: outfit-recommendation-app
     ports:
       - "3000:3000"
+    volumes:
+      - .:/app  # Bind the local directory to the container
+      - /app/node_modules  # Prevent overwriting node_modules
     env_file:
       - .env.local
     restart: always
