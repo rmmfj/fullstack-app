@@ -10,6 +10,7 @@ services:
     volumes:
       - .:/app  # Bind the local directory to the container
       - /app/node_modules  # Prevent overwriting node_modules
+      - /app/.next
     env_file:
       - .env.local
     restart: always
