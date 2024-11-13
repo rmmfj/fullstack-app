@@ -11,8 +11,8 @@ import { Metadata } from "next";
 import { ReactElement } from "react";
 
 interface RecommendationPageProps {
-  params: Promise<{ recommendation_id: string }>;
-  searchParams?: Promise<{ [key: string]: string | undefined }>;
+  params: { recommendation_id: string };
+  searchParams?: { [key: string]: string | undefined };
 }
 
 const RecommendationPage = async ({
