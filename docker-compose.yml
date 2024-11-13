@@ -12,5 +12,5 @@ services:
       - /app/node_modules  # Prevent overwriting node_modules
       - /app/.next
     env_file:
-      - .env.local
+      - .env.production
     restart: always

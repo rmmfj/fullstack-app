@@ -16,9 +16,10 @@ const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const defaultUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://clothing.rfjmm.com"
+    : "http://localhost:3000";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
