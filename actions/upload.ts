@@ -35,14 +35,16 @@ const handleRecommendation = async (
     let recommendations: string | null = null;
     let cleanedRecommendations: ValidatedRecommendation[] = [];
 
-    while (!recommendations || cleanedRecommendations.length === 0) {
+    while (recommendations?.length === 0 || cleanedRecommendations.length === 0) {
       const prompt = constructPromptForRecommendation({ clothingType, gender, numMaxSuggestion });
       recommendations = await sendImgURLAndPromptToGPT({ model, prompt, imageUrl });
-      console.log("GPT recommendations= ", recommendations);
 
       if (!recommendations) continue;
+      // console.log("before label string = ", recommendations);
 
       cleanedRecommendations = validateLabelString(recommendations, clothingType);
+      // console.log("得到的 clothing_type = ", clothingType);
+      // console.log("GPT recommendations= ", cleanedRecommendations);
     }
     const uploadId: number = await insertUpload(imageUrl, userId);
     const paramId: number = await insertParam(gender, clothingType, model);
@@ -66,7 +68,6 @@ const handleRecommendation = async (
         numMaxItem,
         gender,
         clothing_type: clothingType,
-        user_id: userId,
       });
       await insertResults(results as UnstoredResult[]);
       return 0;

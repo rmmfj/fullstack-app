@@ -66,4 +66,4 @@ const handleDatabaseError = (error: unknown, functionName: string) => {
   return null;
 };
 
-export { insertActivityRecommendation, insertActivitySuggestion, insertActivityItem, handleDatabaseError };
+export { handleDatabaseError, insertActivityItem, insertActivityRecommendation, insertActivitySuggestion };

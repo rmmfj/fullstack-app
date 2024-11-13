@@ -5,10 +5,10 @@ import {
   ParamTable,
   RecommendationTable,
   ResultTable,
-  SuggestionTable,
-  UploadTable,
   Series,
-  SimplifiedItemTable
+  SimplifiedItemTable,
+  SuggestionTable,
+  UploadTable
 } from "@/type";
 import { handleDatabaseError } from '../activity';
 import { isFavorite } from '../favorite';
@@ -154,7 +154,7 @@ const getSeriesByIdsForSearching = async (
   user_id?: string,
 ): Promise<Series[] | null> => {
   try {
-    console.time("getSeriesByIdsForSearching");
+    // console.time("getSeriesByIdsForSearching");
 
     const matViewName = gender === "neutral" ? "all_item_matview" : `${gender}_item_matview`;
     const uniqueSeriesIds = Array.from(new Set(series_ids));
@@ -167,16 +167,6 @@ const getSeriesByIdsForSearching = async (
       ...uniqueSeriesIds
     );
 
-    let favoriteStatus: Record<string, boolean> = {};
-    if (user_id !== undefined) {
-      favoriteStatus = await Promise.all(
-        uniqueSeriesIds.map(async (seriesId) => {
-          const isFav = await isFavorite(user_id, seriesId);
-          return { [seriesId]: isFav };
-        })
-      ).then(results => results.reduce((acc, curr) => ({ ...acc, ...curr }), {}));
-    }
-
     for (const seriesId of uniqueSeriesIds) {
       const seriesItems = items.filter(item => item.series_id === seriesId);
 
@@ -185,7 +175,15 @@ const getSeriesByIdsForSearching = async (
         continue;
       }
 
-      const isFavoriteStatus = favoriteStatus[seriesId] || false;
+      // Determine the isFavorite status, checking if user_id is provided
+      const isFavorite = user_id
+        ? await prisma.favorite.findFirst({
+            where: {
+              user_id: user_id,
+              series_id: seriesId,
+            },
+          }) !== null
+        : false;
 
       const originalItems = seriesItems.filter(item => originalItemIds.includes(item.id));
       const otherItems = seriesItems.filter(item => !originalItemIds.includes(item.id));
@@ -200,19 +198,18 @@ const getSeriesByIdsForSearching = async (
 
       const series: Series = {
         items: sortedItems,
-        isFavorite: isFavoriteStatus,
+        isFavorite: isFavorite,
       };
       seriesArray.push(series);
     }
 
-    console.timeEnd("getSeriesByIdsForSearching");
+    // console.timeEnd("getSeriesByIdsForSearching");
     return seriesArray.length > 0 ? seriesArray : null;
   } catch (error) {
     handleDatabaseError(error, "getSeriesByIdsForSearching");
     return null;
   }
 };
-
 
 const getSeriesForRecommendation = async (
   series_ids: string[],
@@ -222,11 +219,12 @@ const getSeriesForRecommendation = async (
   user_id: string
 ): Promise<Series[] | null> => {
   try {
-    console.time("getSeriesForRecommendation");
+    // console.time("getSeriesForRecommendation");
     let clothingTypeString = clothingType === "top" ? "bottom" : "top";
     let genderString = gender === "neutral" ? "all" : gender;
 
     const viewName = `${genderString}_${clothingTypeString}_item_matview`;
+    console.log("viewName =", viewName);
   
     const uniqueSeriesIds = Array.from(new Set(series_ids));
     const seriesArray: Series[] = [];
@@ -266,7 +264,7 @@ const getSeriesForRecommendation = async (
       seriesArray.push(series);
     }
     
-    console.timeEnd("getSeriesForRecommendation");
+    // console.timeEnd("getSeriesForRecommendation");
     return seriesArray.length > 0 ? seriesArray : null;
   } catch (error) {
     handleDatabaseError(error, "getSeriesForRecommendation");
@@ -281,10 +279,8 @@ export {
   getParamById,
   getRecommendationById,
   getResults,
-  getSeriesById,
-  getSeriesIdsByItemIds,
+  getSeriesById, getSeriesByIdsForSearching,
+  getSeriesForRecommendation, getSeriesIdsByItemIds,
   getSuggestion,
-  getUploadById,
-  getSeriesByIdsForSearching,
-  getSeriesForRecommendation
+  getUploadById
 };

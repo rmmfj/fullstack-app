@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const schema = z.object({
   uploadedImage: (typeof window === "undefined"
@@ -34,7 +36,52 @@ const schema = z.object({
   ).refine((files) => files.length > 0, "請上傳圖片"),
 });
 
+const searchQueriesDescription = [
+  "請給我一件寬鬆、舒適的長褲。",
+  "我想要一件合身的西裝。",
+  "尋找一件適合運動的T恤。",
+  "給我一件風格簡約的襯衫。",
+  "找一件有條紋圖案的針織毛衣。",
+  "想要一件適合商務場合的黑色長褲。",
+  "推薦一件適合約會的浪漫風格裙子。",
+];
+
+const searchQueriesSituation = [
+  "我今天想去野餐，請推薦給我適合戶外活動的上衣。",
+  "我要去參加朋友的婚禮，請推薦一件典雅的長裙。",
+  "我想找一件適合週末郊遊的輕便外套。",
+  "今天我想去健身房，請給我一套運動服裝。",
+  "幫我找一件適合正式場合穿的白襯衫。",
+  "我需要一條適合夏日海灘穿的短褲。",
+  "找一件可以搭配牛仔褲的休閒T恤。",
+  "推薦一件適合寒冷天氣穿的高領毛衣。",
+  "我接下來要參加會議，請推薦一件合身的黑色西裝外套。",
+];
+
+const searchQueriesType = [
+  "我想要一件街頭風格的灰色T恤。",
+  "推薦一件復古風格的格子襯衫。",
+  "我需要一件適合極簡風格的白色寬褲。",
+  "推薦一件日系風格的寬鬆連帽外套。",
+  "我想要一條適合優雅風格的高腰長褲。",
+  "幫我找一件美式休閒風的連帽T恤。",
+  "推薦一件法式風格的碎花裙。",
+  "我需要一件工裝風格的多口袋外套。"
+];
+
+const searchQueriesRand = [
+  "找一件舒適的針織毛衣，適合秋冬穿搭。",
+  "推薦一件高腰設計的短裙，適合夏天穿。",
+  "我需要一件有蕾絲細節的白襯衫，優雅又大方。",
+  "今天想去爬山，請推薦一件適合戶外活動的運動外套。",
+  "我有一場重要的面試，推薦一件合適的西裝褲給我。",
+  "我需要一件韓系風格的寬鬆T恤。",
+  "推薦一件輕奢風格的真絲襯衫。",
+]
+
 export default function SearchPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [totalPages, setTotalPages] = useState<number>(0);
   const [labelString, setLabelString] = useState<string>('');
   const [query, setQuery] = useState<string>("");
@@ -49,49 +96,38 @@ export default function SearchPage() {
   const [selectedType, setSelectedType] = useState<string>(""); // 款式
   const [isExpanded, setIsExpanded] = useState(false);
   const [page, setPage] = useState<number>(1);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const searchQueriesDescription = [
-    "請給我一件寬鬆、舒適的長褲。",
-    "我想要一件合身的西裝。",
-    "尋找一件適合運動的T恤。",
-    "給我一件風格簡約的襯衫。",
-    "找一件有條紋圖案的針織毛衣。",
-    "想要一件適合商務場合的黑色長褲。",
-    "推薦一件適合約會的浪漫風格裙子。",
-  ];
-  
-  const searchQueriesSituation = [
-    "我今天想去野餐，請推薦給我適合戶外活動的上衣。",
-    "我要去參加朋友的婚禮，請推薦一件典雅的長裙。",
-    "我想找一件適合週末郊遊的輕便外套。",
-    "今天我想去健身房，請給我一套運動服裝。",
-    "幫我找一件適合正式場合穿的白襯衫。",
-    "我需要一條適合夏日海灘穿的短褲。",
-    "找一件可以搭配牛仔褲的休閒T恤。",
-    "推薦一件適合寒冷天氣穿的高領毛衣。",
-    "我接下來要參加會議，請推薦一件合身的黑色西裝外套。",
-  ];
-  
-  const searchQueriesType = [
-    "我想要一件街頭風格的灰色T恤。",
-    "推薦一件復古風格的格子襯衫。",
-    "我需要一件適合極簡風格的白色寬褲。",
-    "推薦一件日系風格的寬鬆連帽外套。",
-    "我想要一條適合優雅風格的高腰長褲。",
-    "幫我找一件美式休閒風的連帽T恤。",
-    "推薦一件法式風格的碎花裙。",
-    "我需要一件工裝風格的多口袋外套。"
-  ];
-
-  const searchQueriesRand = [
-    "找一件舒適的針織毛衣，適合秋冬穿搭。",
-    "推薦一件高腰設計的短裙，適合夏天穿。",
-    "我需要一件有蕾絲細節的白襯衫，優雅又大方。",
-    "今天想去爬山，請推薦一件適合戶外活動的運動外套。",
-    "我有一場重要的面試，推薦一件合適的西裝褲給我。",
-    "我需要一件韓系風格的寬鬆T恤。",
-    "推薦一件輕奢風格的真絲襯衫。",
-  ]
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user: userResponse },
+      } = await supabase.auth.getUser();
+      setUserId(userResponse?.id as string);
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
+      if (searchParams.get('label_string') && searchParams.get('gender') && searchParams.get('title')) {
+        setLoading(true);
+        setQuery(searchParams.get('title') as string + '的類似單品');
+        setLabelString(searchParams.get('label_string') as string);
+        setGender(searchParams.get('gender') as string);
+        const supabase = createClient();
+        const {
+          data: { user: userResponse },
+        } = await supabase.auth.getUser();
+        setUserId(userResponse?.id as string);
+        const res = await handleSearch(searchParams.get('label_string') as string, searchParams.get('gender'), page, undefined, undefined, undefined, undefined, userResponse?.id);
+        setResults([...(res?.series as Series[])] as Series[]);
+        setTotalPages(res?.totalPages as number);
+        setPage(1);
+        setLoading(false);
+        router.push('/search')
+      }
+    })();
+  }, [searchParams]);
 
   function getRandomItem(array: string[]) {
     const randomIndex = Math.floor(Math.random() * array.length);
@@ -117,13 +153,23 @@ export default function SearchPage() {
     setLoading(true);
     const label = await getLabelStringForTextSearch(gender, "gpt-4o-mini",searchInput);
     setLabelString(label);
-    const res = await handleSearch(label, gender, page);
+    const res = await handleSearch(label, gender, page, undefined, undefined, undefined, undefined, userId as string);
     setResults([...(res?.series as Series[])] as Series[]);
     setTotalPages(res?.totalPages as number);
     setPage(1);
     setQuery(searchInput);
     setSearchInput("");
     // console.log(res?.series);
+    setLoading(false);
+  };
+
+  const handlePageNavigation = async (page: number) => {
+    setPage(page);
+    setLoading(true);
+    console.log(labelString)
+    const res = await handleSearch(labelString, gender, page, undefined, undefined, undefined, undefined, userId as string);
+    console.log(res);
+    setResults([...(res?.series as Series[])] as Series[]);
     setLoading(false);
   };
 
@@ -298,15 +344,7 @@ export default function SearchPage() {
           <PaginationBar
             currentPage={page}
             totalPages={totalPages}
-              onPageChange={async (page: number) => {
-                setPage(page);
-                setLoading(true);
-                console.log(labelString)
-                const res = await handleSearch(labelString, gender, page);
-                console.log(res);
-                setResults([...(res?.series as Series[])] as Series[]);
-                setLoading(false);
-              }}
+            onPageChange={handlePageNavigation}
           />
         </div>
       }

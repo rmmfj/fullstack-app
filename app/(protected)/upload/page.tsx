@@ -160,7 +160,7 @@ function ConfirmButton({ isConfirmed }: { isConfirmed: boolean }) {
           ? "bg-red-400 hover:bg-red-300"
           : "bg-indigo-400 hover:bg-indigo-300"
         )}
-        {...{ type: isConfirmed ? 'button' : 'submit'}}
+        {...(isConfirmed ? {} : { type: 'submit'})}
         onClick={async () => {
           if (secondsSpent > 0) {
             router.push('/upload?step=1');
@@ -202,6 +202,7 @@ export default function UploadPage() {
     setCurrentStep(currentStep + 1);
   };
   const prevStep = () => {
+    setIsConfirmed(false);
     setCurrentStep(currentStep - 1);
   };
 

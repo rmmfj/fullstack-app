@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Series } from "@/type";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ItemCard from "./item-card";
+import { createClient } from "@/utils/supabase/client";
 
 const parseTags = (stylePreferencesString: string) => {
   return stylePreferencesString.split(",");
@@ -29,11 +30,21 @@ const ItemList = ({
   expandable: boolean,
 }) => {
   const [isExpanded, setIsExpanded] = useState(expandOnMount || false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
-  const router = useRouter();
+
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user: userResponse },
+      } = await supabase.auth.getUser();
+      setUserId(userResponse?.id as string);
+    })();
+  }, []);
 
   return (
     <div
@@ -53,7 +64,7 @@ const ItemList = ({
 
       <div className='flex gap-4 flex-wrap items-start justify-center'>
         {(isExpanded ? series : series.slice(0, 4)).map((s) => {
-          return <ItemCard series={s} key={`item-card-${s.items[0].id}`} />;
+          return <ItemCard userId={userId} series={s} key={`item-card-${s.items[0].id}`} />;
         })}
       </div>
 

@@ -1,6 +1,5 @@
 "use server";
 
-import { getFavoriteByUserId, handleFavorite } from "@/actions/favorite";
 
 
 export default async function Playground2() {

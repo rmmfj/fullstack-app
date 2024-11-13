@@ -30,11 +30,11 @@ const getLabelStringForImageSearch = async (
         prompt,
         imageUrl,
       });
-
+      // console.log("the raw label = ", rawLabelString);
       if (rawLabelString) {
         cleanedLabels = validateLabelString(rawLabelString);
       }
-      console.log("GPT recommendation: ", cleanedLabels);
+      console.log("Image Search recommendation: ", cleanedLabels);
 
       if (!rawLabelString || cleanedLabels.length === 0) {
         console.warn("Retrying sendImgURLAndPromptToGPT due to invalid results...");
@@ -44,6 +44,43 @@ const getLabelStringForImageSearch = async (
     return cleanedLabels[0].labelString;
   } catch (error) {
     handleDatabaseError(error, "getLabelStringForImageSearch");
+    return "";
+  }
+};
+
+const getLabelStringForTextSearch = async (
+  gender: Gender,
+  model: string,
+  query: string,
+): Promise<string> => {
+  try {
+    let rawLabelString: string | null = null;
+    let cleanedLabels: ValidatedRecommendation[] = [];
+
+    while (!rawLabelString || cleanedLabels.length === 0) {
+      const prompt: string = constructPromptForTextSearch({
+        query,
+        gender,
+      });
+
+      rawLabelString = await sendPromptToGPT({
+        model,
+        prompt,
+      });
+      // console.log("the raw label = ", rawLabelString);
+      if (rawLabelString) {
+        cleanedLabels = validateLabelString(rawLabelString);
+      }
+      console.log("Text Search recommendation: ", cleanedLabels);
+
+      if (!rawLabelString || cleanedLabels.length === 0) {
+        console.warn("Retrying sendPromptToGPT due to invalid results...");
+      }
+    }
+
+    return cleanedLabels[0].labelString;
+  } catch (error) {
+    handleDatabaseError(error, "getLabelStringForTextSearch");
     return "";
   }
 };
@@ -69,7 +106,7 @@ const handleSearch = async (
       page,
       user_id,
     });
-    console.log("searchResult: ", searchResult);
+    console.log("handle searsh searchResult: ", searchResult);
     return searchResult;
   } catch (error) {
     handleDatabaseError(error, "handleImageSearch");
@@ -77,41 +114,4 @@ const handleSearch = async (
   }
 };
 
-const getLabelStringForTextSearch = async (
-  gender: Gender,
-  model: string,
-  query: string,
-): Promise<string> => {
-  try {
-    let rawLabelString: string | null = null;
-    let cleanedLabels: ValidatedRecommendation[] = [];
-
-    while (!rawLabelString || cleanedLabels.length === 0) {
-      const prompt: string = constructPromptForTextSearch({
-        query,
-        gender,
-      });
-
-      rawLabelString = await sendPromptToGPT({
-        model,
-        prompt,
-      });
-
-      if (rawLabelString) {
-        cleanedLabels = validateLabelString(rawLabelString);
-      }
-      console.log("GPT recommendation: ", cleanedLabels);
-
-      if (!rawLabelString || cleanedLabels.length === 0) {
-        console.warn("Retrying sendPromptToGPT due to invalid results...");
-      }
-    }
-
-    return cleanedLabels[0].labelString;
-  } catch (error) {
-    handleDatabaseError(error, "getLabelStringForTextSearch");
-    return "";
-  }
-};
-
-export { getLabelStringForImageSearch, handleSearch, getLabelStringForTextSearch}
+export { getLabelStringForImageSearch, getLabelStringForTextSearch, handleSearch };

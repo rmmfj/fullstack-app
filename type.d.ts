@@ -11,13 +11,6 @@ export type FavoriteTable = Favorite;
 
 export type SimplifiedItemTable = Omit<Item, 'embedding'>;
 export type Series = { items: SimplifiedItemTable[], isFavorite: boolean };
-// export interface Recommendation {
-//   param: ParamTable;
-//   upload: UploadTable;
-//   styles: {
-//     [styleName: string]: { series: Series[], description: string };
-//   };
-// }
 
 export interface Recommendation {
   clothingType: ClothingType;
