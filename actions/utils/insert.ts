@@ -35,8 +35,11 @@ const storeImageToStorage = async (base64: string, filename: string) => {
       method: "POST",
       body: formData,
       headers: {
-        Authorization: `Bearer ${process.env.IMAGE_SERVER_ACCESS_SECRET}`, // Replace with your shared secret
+        "Content-Type": "multipart/form-data",
       },
+      // headers: {
+      //   Authorization: `Bearer ${process.env.IMAGE_SERVER_ACCESS_SECRET}`, // Replace with your shared secret
+      // },
     });
 
     if (!response.ok) {

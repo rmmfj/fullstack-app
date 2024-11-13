@@ -1,9 +1,9 @@
-version: '3.8'
+version: '3.9'
 services:
   app:
     image: node:20
     container_name: outfit-recommendation-app
-    working_dir: /app
+    working_dir: /
     volumes:
       - .:/app
     ports:
