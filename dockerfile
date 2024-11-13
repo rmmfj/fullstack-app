@@ -7,11 +7,11 @@ WORKDIR /app
 # Copy only necessary files for dependency installation
 COPY package.json ./
 
-# Install dependencies
-RUN yarn install
-
 # Copy the entire project (excluding items in .dockerignore)
 COPY . .
+
+# Install dependencies
+RUN yarn install
 
 # Build the Next.js app
 RUN yarn build

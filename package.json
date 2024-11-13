@@ -78,5 +78,8 @@
   "overrides": {
     "@supabase/supabase-js": "2.24.0",
     "@supabase/gotrue-js": "2.38.0"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
   }
 }
