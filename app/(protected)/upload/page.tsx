@@ -225,6 +225,7 @@ export default function UploadPage() {
       if (typeof reader.result === "string") {
         const base64 = reader.result;
         const filename = file.name;
+        console.log(filename)
         try {
           const imageUrl = await storeImageToStorage(base64, filename);
           const {
