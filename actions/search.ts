@@ -21,24 +21,29 @@ const getLabelStringForImageSearch = async (
   try {
     let rawLabelString: string | null = null;
     let cleanedLabels: ValidatedRecommendation[] = [];
+    const maxRetries = 5;
+    let attempts = 0;
 
-    while (!rawLabelString || cleanedLabels.length === 0) {
+    while (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
+      if (attempts >= maxRetries) {
+        console.error("Max retries reached for image search.");
+        return "";
+      }
       const prompt: string = constructPromptForImageSearch({ gender });
-
       rawLabelString = await sendImgURLAndPromptToGPT({
         model,
         prompt,
         imageUrl,
       });
-      // console.log("the raw label = ", rawLabelString);
       if (rawLabelString) {
         cleanedLabels = validateLabelString(rawLabelString);
       }
       console.log("Image Search recommendation: ", cleanedLabels);
 
-      if (!rawLabelString || cleanedLabels.length === 0) {
+      if (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
         console.warn("Retrying sendImgURLAndPromptToGPT due to invalid results...");
       }
+      attempts++;
     }
 
     return cleanedLabels[0].labelString;
@@ -56,8 +61,14 @@ const getLabelStringForTextSearch = async (
   try {
     let rawLabelString: string | null = null;
     let cleanedLabels: ValidatedRecommendation[] = [];
+    const maxRetries = 5;
+    let attempts = 0;
 
-    while (!rawLabelString || cleanedLabels.length === 0) {
+    while (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
+      if (attempts >= maxRetries) {
+        console.error("Max retries reached for text search.");
+        return "";
+      }
       const prompt: string = constructPromptForTextSearch({
         query,
         gender,
@@ -67,15 +78,14 @@ const getLabelStringForTextSearch = async (
         model,
         prompt,
       });
-      // console.log("the raw label = ", rawLabelString);
       if (rawLabelString) {
         cleanedLabels = validateLabelString(rawLabelString);
       }
-      console.log("Text Search recommendation: ", cleanedLabels);
 
-      if (!rawLabelString || cleanedLabels.length === 0) {
+      if (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
         console.warn("Retrying sendPromptToGPT due to invalid results...");
       }
+      attempts++;
     }
 
     return cleanedLabels[0].labelString;

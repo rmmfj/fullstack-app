@@ -1,9 +1,12 @@
 "use server";
 
+import { handleDatabaseError } from "@/actions/activity";
+
 
 
 export default async function Playground2() {
   try {
+    // const e = handleDatabaseError("No series found for the given series IDs", "getRecommendationRecordById");
     // const favorite = await handleFavorite("64d2474a-2ac8-4775-ab5e-2c8a31bb037c", "0475159c-a171-464e-9d09-733839340744");
     // const favorite2 = await handleFavorite("64d2474a-2ac8-4775-ab5e-2c8a31bb037c", "c3fa429a-e49c-471a-b67f-c5cedb5e1cb4");
     // const result = await getFavoriteByUserId("64d2474a-2ac8-4775-ab5e-2c8a31bb037c");

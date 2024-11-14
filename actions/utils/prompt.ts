@@ -16,7 +16,7 @@ const constructPromptForRecommendation = ({
     ${clothingType === "top" ? "上衣" : "下身類衣物"}
     ，請推薦${numMaxSuggestion}種與之搭配的
     ${clothingType === "top" ? "下身類衣物" : "上衣"}。
-    對於每一種搭配，請提供一個風格名稱和推薦的原因。
+    對於每一種搭配，請提供一個風格名稱和推薦的原因，若對於某一種風格並沒有想要特別指定顏色的話，可以於顏色的欄位中標示為“無限制”。
     請使用下方 JSON 格式回覆，回答無需包含其他資訊：
     [
       {
@@ -78,12 +78,13 @@ const constructPromptForTextSearch = ({
   gender: Gender;
 }): string => {
   return `
-    請將這位性別為${gender}的使用者的需求：${query}
+    請參考這位性別為${gender}的使用者的需求：${query}。
+    若是使用者的需求中沒有特別註明關於顏色的敘述，顏色可以為“無限制”。
     請使用下方 JSON 格式回覆，回答無需包含其他資訊：
     [
       {
         "item": {
-          "顏色": "[顏色]", 
+          "顏色": "[顏色]",
           "服裝類型": "[類型]", 
           "剪裁版型": "[描述]", 
           "設計特點": "[描述]", 

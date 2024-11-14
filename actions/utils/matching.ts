@@ -26,6 +26,10 @@ const vectorSearchForRecommendation = async (
       ORDER BY ${viewName}.embedding <#> $1::vector
       LIMIT $3;
     `, suggestedEmbedding, matchThreshold, numMaxItem);
+    if (!items.length) {
+      console.error("No items found for vectorSearchForRecommendation");
+      return [];
+    }
 
     const series: Series[] = items.map(simplifiedItem => ({
       items: [{
@@ -53,15 +57,12 @@ const vectorSearchForSearching = async (
   clothingType?: ClothingType,
 ): Promise<{ series: Series[]; totalItems: number } | null> => {
   try {
-    //setting the mat view
     const suggestedEmbedding = await generateEmbedding(suggestedLabelString);
     const matchThreshold = -0.9;
     let genderString = gender === "neutral" ? "all" : gender;
     const viewName = `${genderString}_item_matview`;
     const offset = (page - 1) * pageSize;
-    // console.log("mat view name: ", viewName);
 
-    //setting the filters
     let filterConditions = `${viewName}.embedding <#> $1::vector < $2`;
     const queryParams: any[] = [suggestedEmbedding, matchThreshold];
     let paramIndex = 3;
@@ -89,16 +90,11 @@ const vectorSearchForSearching = async (
       SELECT COUNT(*) AS total_count
       FROM ${viewName}
       WHERE ${filterConditions}
-      GROUP BY embedding
-      ORDER BY embedding <#> $1::vector
     `;
-    // console.log("countQuery: ", countQuery);
 
     const totalItemsResult = await prisma.$queryRawUnsafe<{ total_count: bigint }[]>(countQuery, ...queryParams);
-    // console.log("Similarity results: ", totalItemsResult);
-
-    const totalItems = totalItemsResult.reduce((sum, item) => sum + Number(item.total_count), 0);
-    // console.log("query total count: ", totalItems);
+    const totalItems = totalItemsResult.length ? Number(totalItemsResult[0].total_count) : 0;
+    // const totalItems = totalItemsResult.reduce((sum, item) => sum + Number(item.total_count), 0);
 
     const mainQuery = `
       SELECT id, clothing_type, color, external_link, gender, image_url, label_string, price, provider, series_id, title
@@ -110,6 +106,10 @@ const vectorSearchForSearching = async (
     const mainQueryParams = [...queryParams, pageSize, offset];
 
     const items: SimplifiedItemTable[] = await prisma.$queryRawUnsafe(mainQuery, ...mainQueryParams);
+    if (!items.length) {
+      console.error("No items found for vectorSearchForSearching");
+      return { series: [], totalItems };
+    }
 
     const series: Series[] = items.map(simplifiedItem => ({
       items: [{
@@ -147,8 +147,9 @@ const semanticSearchForRecommendation = async ({
       clothing_type,
     );
 
-    if (!similarItems) {
-      return null;
+    if (!similarItems || similarItems.length === 0) {
+      console.error("No similar items found in semanticSearchForRecommendation");
+      return [];
     }
 
     const results: UnstoredResult[] = similarItems.map((series: Series, index: number) => ({
@@ -183,8 +184,9 @@ const semanticSearchWithoutLogin = async ({
       clothing_type,
     );
 
-    if (!similarItems) {
-      return null;
+    if (!similarItems || similarItems.length === 0) {
+      console.error("No similar items found in vectorSearchForRecommendation");
+      return [];
     }
 
     const itemIds = similarItems.flatMap(series => series.items.map(item => item.id));
@@ -196,6 +198,10 @@ const semanticSearchWithoutLogin = async ({
         },
       },
     });
+    if (!items.length) {
+      console.error("No items found in semanticSearchWithoutLogin");
+      return [];
+    }
 
     const simplifiedItems: SimplifiedItemTable[] = items.map(item => ({
       clothing_type: item.clothing_type,
@@ -265,7 +271,8 @@ const semanticSearchForSearching = async ({
     );
 
     if (!searchResultData || searchResultData.series.length === 0) {
-      return null;
+      console.error("No search results found in semanticSearchForSearching");
+      return { series: [], totalPages: 0 };
     }
 
     const { series, totalItems } = searchResultData;
@@ -290,6 +297,7 @@ const semanticSearchForSearching = async ({
       series: seriesArray as Series[],
       totalPages
     } as SearchResult;
+    
 
   } catch (error) {
     handleDatabaseError(error, "semanticSearchForSearching");

@@ -11,11 +11,10 @@ import {
   UploadTable
 } from "@/type";
 import { handleDatabaseError } from '../activity';
-import { isFavorite } from '../favorite';
 
 const getResults = async (suggestionId: number): Promise<ResultTable[] | null> => {
   try {
-    return await prisma.result.findMany({
+    const results = await prisma.result.findMany({
       where: { suggestion_id: suggestionId },
       select: {
         created_at: true,
@@ -25,6 +24,7 @@ const getResults = async (suggestionId: number): Promise<ResultTable[] | null> =
         suggestion_id: true,
       },
     });
+    return results.length > 0 ? results : null;
   } catch (error) {
     return handleDatabaseError(error, 'getResults');
   }
@@ -34,9 +34,10 @@ const getResults = async (suggestionId: number): Promise<ResultTable[] | null> =
 const getSuggestion = async (inputRecommendationId: number): Promise<SuggestionTable[] | null> => {
   try {
     const recommendationId = inputRecommendationId ? Number(inputRecommendationId) : null;
-    return await prisma.suggestion.findMany({
+    const suggestions = await prisma.suggestion.findMany({
       where: { recommendation_id: recommendationId },
     });
+    return suggestions.length > 0 ? suggestions : null;
   } catch (error) {
     return handleDatabaseError(error, 'getSuggestion');
   }
@@ -46,9 +47,10 @@ const getSuggestion = async (inputRecommendationId: number): Promise<SuggestionT
 const getRecommendationById = async (inputRecommendationId: number): Promise<RecommendationTable | null> => {
   try {
     const recommendationId = inputRecommendationId ? Number(inputRecommendationId) : null;
-    return await prisma.recommendation.findUnique({
+    const recommendation = await prisma.recommendation.findUnique({
       where: { id: recommendationId as number },
-    }) as RecommendationTable | null;
+    });
+    return recommendation ?? null;
   } catch (error) {
     return handleDatabaseError(error, 'getRecommendationById');
   }
@@ -57,9 +59,10 @@ const getRecommendationById = async (inputRecommendationId: number): Promise<Rec
 // Fetches parameter by ID
 const getParamById = async (paramId: number): Promise<ParamTable | null> => {
   try {
-    return await prisma.param.findUnique({
+    const param = await prisma.param.findUnique({
       where: { id: paramId },
-    }) as ParamTable | null;
+    });
+    return param ?? null;
   } catch (error) {
     return handleDatabaseError(error, 'getParamById');
   }
@@ -68,9 +71,10 @@ const getParamById = async (paramId: number): Promise<ParamTable | null> => {
 // Fetches upload by ID
 const getUploadById = async (uploadId: number): Promise<UploadTable | null> => {
   try {
-    return await prisma.upload.findUnique({
+    const upload = await prisma.upload.findUnique({
       where: { id: uploadId },
-    }) as UploadTable | null;
+    });
+    return upload ?? null;
   } catch (error) {
     return handleDatabaseError(error, 'getUploadById');
   }
@@ -79,9 +83,10 @@ const getUploadById = async (uploadId: number): Promise<UploadTable | null> => {
 // Fetches item by ID
 const getItemById = async (itemId: string): Promise<ItemTable | null> => {
   try {
-    return await prisma.item.findUnique({
+    const item = await prisma.item.findUnique({
       where: { id: itemId },
-    }) as ItemTable | null;
+    });
+    return item ?? null;
   } catch (error) {
     return handleDatabaseError(error, 'getItemById');
   }
@@ -90,9 +95,10 @@ const getItemById = async (itemId: string): Promise<ItemTable | null> => {
 // Fetches multiple items by their IDs
 const getItemsByIds = async (itemIds: string[]): Promise<ItemTable[] | null> => {
   try {
-    return await prisma.item.findMany({
+    const items = await prisma.item.findMany({
       where: { id: { in: itemIds } },
-    }) as ItemTable[];
+    });
+    return items.length > 0 ? items : null;
   } catch (error) {
     return handleDatabaseError(error, 'getItemsByIds');
   }
@@ -126,9 +132,11 @@ const getSeriesIdsByItemIds = async (itemIds: string[]): Promise<string[]> => {
 // Fetches items in a series by series ID
 const getSeriesById = async (seriesId: string): Promise<ItemTable[] | null> => {
   try {
-    return await prisma.item.findMany({
+    const items = await prisma.item.findMany({
       where: { series_id: seriesId },
-    }) as ItemTable[];
+    });
+
+    return items.length > 0 ? items : [];
   } catch (error) {
     return handleDatabaseError(error, 'getSeriesById');
   }
@@ -151,7 +159,7 @@ const getSeriesByIdsForSearching = async (
   series_ids: string[],
   originalItemIds: string[],
   gender: string,
-  user_id?: string,
+  user_id?: string
 ): Promise<Series[] | null> => {
   try {
     // console.time("getSeriesByIdsForSearching");
@@ -175,7 +183,6 @@ const getSeriesByIdsForSearching = async (
         continue;
       }
 
-      // Determine the isFavorite status, checking if user_id is provided
       const isFavorite = user_id
         ? await prisma.favorite.findFirst({
             where: {
@@ -217,17 +224,24 @@ const getSeriesForRecommendation = async (
   gender: string,
   clothingType: string,
   user_id: string
-): Promise<Series[] | null> => {
+): Promise<Series[]|null> => {
   try {
     // console.time("getSeriesForRecommendation");
     let clothingTypeString = clothingType === "top" ? "bottom" : "top";
     let genderString = gender === "neutral" ? "all" : gender;
 
     const viewName = `${genderString}_${clothingTypeString}_item_matview`;
-    console.log("viewName =", viewName);
+    // console.log("viewName =", viewName);
   
     const uniqueSeriesIds = Array.from(new Set(series_ids));
     const seriesArray: Series[] = [];
+    const favorites = await prisma.favorite.findMany({
+      where: { 
+        user_id: user_id, 
+        series_id: { in: uniqueSeriesIds } },
+    });
+
+    const favoriteSeriesIds = new Set(favorites.map(fav => fav.series_id));
 
     for (const seriesId of uniqueSeriesIds) {
       const data: SimplifiedItemTable[] = await prisma.$queryRawUnsafe(
@@ -239,12 +253,13 @@ const getSeriesForRecommendation = async (
         console.log(`No valid items for series ${seriesId}.`);
         continue;
       }
-      const isFavorite = await prisma.favorite.findFirst({
-        where: {
-          user_id: user_id,
-          series_id: seriesId,
-        },
-      }) !== null;
+      // const isFavorite = await prisma.favorite.findFirst({
+      //   where: {
+      //     user_id: user_id,
+      //     series_id: seriesId,
+      //   },
+      // }) !== null;
+      const isFavorite = favoriteSeriesIds.has(seriesId);
 
       const originalItems = data.filter(item => originalItemIds.includes(item.id));
       const otherItems = data.filter(item => !originalItemIds.includes(item.id));

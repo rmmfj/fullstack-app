@@ -5,7 +5,7 @@ const insertActivityRecommendation = async (
   user_id: string,
   recommendation_id: number,
   activity_type: string
-): Promise<number> => {
+): Promise<number | null> => {
   try {
     const activity = await prisma.userActivityRecommendation.create({
       data: {
@@ -16,8 +16,7 @@ const insertActivityRecommendation = async (
     });
     return activity.id;
   } catch (error) {
-    console.error("Unexpected error in insertActivityRecommendation:", error);
-    return -1;
+    return handleDatabaseError(error, "insertActivityRecommendation");
   }
 };
 
@@ -25,7 +24,7 @@ const insertActivitySuggestion = async (
   user_id: string,
   suggestion_id: number,
   activity_type: string
-): Promise<number> => {
+): Promise<number | null> => {
   try {
     const activity = await prisma.userActivitySuggestion.create({
       data: {
@@ -36,8 +35,7 @@ const insertActivitySuggestion = async (
     });
     return activity.id;
   } catch (error) {
-    console.error("Unexpected error in insertActivitySuggestion:", error);
-    return -1;
+    return handleDatabaseError(error, "insertActivitySuggestion");
   }
 };
 
@@ -45,7 +43,7 @@ const insertActivityItem = async (
   user_id: string,
   item_id: string,
   activity_type: string
-): Promise<number> => {
+): Promise<number | null> => {
   try {
     const activity = await prisma.userActivityItem.create({
       data: {
@@ -56,8 +54,7 @@ const insertActivityItem = async (
     });
     return activity.id;
   } catch (error) {
-    console.error("Unexpected error in insertActivityItem:", error);
-    return -1;
+    return handleDatabaseError(error, "insertActivityItem");
   }
 };
 
