@@ -3,7 +3,8 @@ import { ClothingType, ValidatedRecommendation } from "@/type";
 
 const validateLabelString = (
   recommendations: string,
-  clothingType?: ClothingType
+  isSimilar: boolean,
+  clothingType?: ClothingType,
 ): ValidatedRecommendation[] => {
   try {
     // console.log("Received recommendations string:", recommendations);
@@ -49,7 +50,7 @@ const validateLabelString = (
       .map((rec) => ({
         styleName: rec.styleName || "",
         description: rec.description || "",
-        labelString: generateLabelString(rec, clothingType),
+        labelString: generateLabelString(rec, isSimilar, clothingType),
       }));
 
     return cleanedLabel;
@@ -61,17 +62,28 @@ const validateLabelString = (
 
 const generateLabelString = (
   rec: { item: { [key: string]: string } },
-  clothingType?: ClothingType
+  isSimilar: boolean,
+  clothingType?: ClothingType,
 ): string => {
   const baseInfo = `顏色: ${rec.item.顏色}, 服裝類型: ${rec.item.服裝類型}, 剪裁版型: ${rec.item.剪裁版型}, 設計特點: ${rec.item.設計特點}, 材質: ${rec.item.材質}, 細節: ${rec.item.細節}`;
 
   let specificInfo = "";
-  if (clothingType === "top") {
-    specificInfo = `褲管: ${rec.item.褲管 ?? "N/A"}, 裙擺: ${rec.item.裙擺 ?? "N/A"}`;
-  } else if (clothingType === "bottom") {
-    specificInfo = `領子: ${rec.item.領子 ?? "N/A"}, 袖子: ${rec.item.袖子 ?? "N/A"}`;
+  if (isSimilar) {
+    if (clothingType === "top") {
+      specificInfo = `領子: ${rec.item.領子 ?? "N/A"}, 袖子: ${rec.item.袖子 ?? "N/A"}`;
+    } else if (clothingType === "bottom") {
+      specificInfo = `褲管: ${rec.item.褲管 ?? "N/A"}, 裙擺: ${rec.item.裙擺 ?? "N/A"}`;
+    } else {
+      specificInfo = `褲管: ${rec.item.褲管 ?? "N/A"}, 裙擺: ${rec.item.裙擺 ?? "N/A"}, 領子: ${rec.item.領子 ?? "N/A"}, 袖子: ${rec.item.袖子 ?? "N/A"}`;
+    }
   } else {
-    specificInfo = `褲管: ${rec.item.褲管 ?? "N/A"}, 裙擺: ${rec.item.裙擺 ?? "N/A"}, 領子: ${rec.item.領子 ?? "N/A"}, 袖子: ${rec.item.袖子 ?? "N/A"}`;
+    if (clothingType === "top") {
+      specificInfo = `褲管: ${rec.item.褲管 ?? "N/A"}, 裙擺: ${rec.item.裙擺 ?? "N/A"}`;
+    } else if (clothingType === "bottom") {
+      specificInfo = `領子: ${rec.item.領子 ?? "N/A"}, 袖子: ${rec.item.袖子 ?? "N/A"}`;
+    } else {
+      specificInfo = `褲管: ${rec.item.褲管 ?? "N/A"}, 裙擺: ${rec.item.裙擺 ?? "N/A"}, 領子: ${rec.item.領子 ?? "N/A"}, 袖子: ${rec.item.袖子 ?? "N/A"}`;
+    }
   }
   return `${baseInfo}, ${specificInfo}`;
 };

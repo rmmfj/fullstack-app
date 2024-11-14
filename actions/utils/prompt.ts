@@ -49,6 +49,7 @@ const constructPromptForImageSearch = ({
   const prompt: string = `
     請仔細觀察這張圖片中性別為${gender}的
     衣物，並且提供一組詳盡的描述。
+    同時判斷衣物的類型 (上半身或下半身)。
     請使用下方 JSON 格式回覆，回答無需包含其他資訊：
     [
       {
@@ -63,7 +64,8 @@ const constructPromptForImageSearch = ({
           "袖子": "[描述]", //選填
           "褲管": "[描述]", //選填
           "裙擺": "[描述]" //選填
-        }
+        },
+        "clothing_type": "[上半身/下半身]"
       }
     ]
   `;
@@ -80,6 +82,7 @@ const constructPromptForTextSearch = ({
   return `
     請參考這位性別為${gender}的使用者的需求：${query}。
     若是使用者的需求中沒有特別註明關於顏色的敘述，顏色可以為“無限制”。
+    同時判斷衣物的類型 (上半身或下半身)。
     請使用下方 JSON 格式回覆，回答無需包含其他資訊：
     [
       {
@@ -94,7 +97,8 @@ const constructPromptForTextSearch = ({
           "袖子": "[描述]", //選填
           "褲管": "[描述]", //選填
           "裙擺": "[描述]" //選填
-        }
+        },
+        "clothing_type": "[上半身/下半身]"
       }
     ]
   `;

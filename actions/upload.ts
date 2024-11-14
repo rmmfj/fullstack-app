@@ -48,7 +48,7 @@ const handleRecommendation = async (
 
       if (!recommendations) continue;
 
-      cleanedRecommendations = validateLabelString(recommendations, clothingType);
+      cleanedRecommendations = validateLabelString(recommendations, false, clothingType);
       attempts++;
     }
     const uploadId: number = await insertUpload(imageUrl, userId);
@@ -109,7 +109,7 @@ const handleRecommendationWithoutLogin = async (
       rawLabelString = await sendImgURLAndPromptToGPT({ model, prompt, imageUrl });
 
       if (rawLabelString) {
-        cleanedLabels = validateLabelString(rawLabelString, clothingType);
+        cleanedLabels = validateLabelString(rawLabelString, false, clothingType);
       }
       console.log("GPT recommendations= ", cleanedLabels);
 

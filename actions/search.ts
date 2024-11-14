@@ -17,27 +17,56 @@ const getLabelStringForImageSearch = async (
   gender: Gender,
   model: string,
   imageUrl: string
-): Promise<string> => {
+): Promise<{ labelString: string; clothing_type?: ClothingType }> => {
   try {
     let rawLabelString: string | null = null;
     let cleanedLabels: ValidatedRecommendation[] = [];
     const maxRetries = 5;
     let attempts = 0;
+    let detectedClothingType: ClothingType | undefined;
 
     while (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
       if (attempts >= maxRetries) {
         console.error("Max retries reached for image search.");
-        return "";
+        return { labelString: "", clothing_type: undefined };
       }
+
       const prompt: string = constructPromptForImageSearch({ gender });
       rawLabelString = await sendImgURLAndPromptToGPT({
         model,
         prompt,
         imageUrl,
       });
+      console.log("get gpt rec: ", rawLabelString);
       if (rawLabelString) {
-        cleanedLabels = validateLabelString(rawLabelString);
+        let clothingTypeString = rawLabelString;
+        if (typeof clothingTypeString !== "string") {
+          console.log("Recommendations is not a string:", clothingTypeString);
+          rawLabelString = null;
+          continue;
+        }
+    
+        const cleanedClothingType = clothingTypeString.replace(/```json\s*|\s*```/g, "").trim();
+    
+        if (!cleanedClothingType.startsWith("[")) {
+          console.log("Cleaned recommendations does not start with '[':", cleanedClothingType);
+          rawLabelString = null;
+          continue;
+        }
+        try {
+          const parsedData = JSON.parse(cleanedClothingType)[0];
+          detectedClothingType =
+            parsedData.clothing_type === "上半身" ? "top" :
+            parsedData.clothing_type === "下半身" ? "bottom" :
+            undefined;
+          console.log("parsed clothing type: ", parsedData.clothing_type);
+          cleanedLabels = validateLabelString(rawLabelString, true, detectedClothingType);
+        } catch (parseError) {
+          console.error("Failed to parse rawLabelString JSON:", parseError);
+          detectedClothingType = undefined;
+        }
       }
+
       console.log("Image Search recommendation: ", cleanedLabels);
 
       if (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
@@ -45,11 +74,13 @@ const getLabelStringForImageSearch = async (
       }
       attempts++;
     }
-
-    return cleanedLabels[0].labelString;
+    return {
+      labelString: cleanedLabels[0]?.labelString || "",
+      clothing_type: detectedClothingType,
+    };
   } catch (error) {
     handleDatabaseError(error, "getLabelStringForImageSearch");
-    return "";
+    return { labelString: "", clothing_type: undefined };
   }
 };
 
@@ -57,18 +88,20 @@ const getLabelStringForTextSearch = async (
   gender: Gender,
   model: string,
   query: string,
-): Promise<string> => {
+): Promise<{ labelString: string; clothing_type?: ClothingType }> => {
   try {
     let rawLabelString: string | null = null;
     let cleanedLabels: ValidatedRecommendation[] = [];
     const maxRetries = 5;
     let attempts = 0;
+    let detectedClothingType: ClothingType | undefined;
 
     while (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
       if (attempts >= maxRetries) {
         console.error("Max retries reached for text search.");
-        return "";
+        return { labelString: "", clothing_type: undefined };
       }
+
       const prompt: string = constructPromptForTextSearch({
         query,
         gender,
@@ -78,8 +111,34 @@ const getLabelStringForTextSearch = async (
         model,
         prompt,
       });
+
       if (rawLabelString) {
-        cleanedLabels = validateLabelString(rawLabelString);
+        let clothingTypeString = rawLabelString;
+        if (typeof clothingTypeString !== "string") {
+          console.log("Recommendations is not a string:", clothingTypeString);
+          rawLabelString = null;
+          continue;
+        }
+
+        const cleanedClothingType = clothingTypeString.replace(/```json\s*|\s*```/g, "").trim();
+
+        if (!cleanedClothingType.startsWith("[")) {
+          console.log("Cleaned recommendations does not start with '[':", cleanedClothingType);
+          rawLabelString = null;
+          continue;
+        }
+
+        try {
+          const parsedData = JSON.parse(cleanedClothingType)[0];
+          detectedClothingType =
+            parsedData.clothing_type === "上半身" ? "top" :
+            parsedData.clothing_type === "下半身" ? "bottom" :
+            undefined;
+          cleanedLabels = validateLabelString(rawLabelString, true, detectedClothingType);
+        } catch (parseError) {
+          console.error("Failed to parse rawLabelString JSON:", parseError);
+          detectedClothingType = undefined;
+        }
       }
 
       if (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
@@ -88,10 +147,13 @@ const getLabelStringForTextSearch = async (
       attempts++;
     }
 
-    return cleanedLabels[0].labelString;
+    return {
+      labelString: cleanedLabels[0]?.labelString || "",
+      clothing_type: detectedClothingType,
+    };
   } catch (error) {
     handleDatabaseError(error, "getLabelStringForTextSearch");
-    return "";
+    return { labelString: "", clothing_type: undefined };
   }
 };
 
