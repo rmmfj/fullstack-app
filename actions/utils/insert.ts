@@ -26,19 +26,17 @@ const storeImageToStorage = async (base64: string, filename: string) => {
 
   try {
     // Send the image to the image server
-    const response = await fetch(
-      `https://clothing.rfjmm.com/image/upload?filename=${encodeURIComponent(
-        filename
-      )}`,
-      {
-        method: "POST",
-        body: blob,
-        headers: {
-          Origin: "https://clothing.rfjmm.com",
-          "Content-Type": "application/octet-stream", // Send raw binary data
-        },
-      }
-    );
+    const formData = new FormData();
+    formData.append("file", blob, filename);
+
+    const response = await fetch("https://clothing.rfjmm.com/image/upload", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Origin: "https://clothing.rfjmm.com",
+      },
+    });
+
 
     if (!response.ok) {
       throw new Error(`Failed to upload image: ${response.statusText}`);
