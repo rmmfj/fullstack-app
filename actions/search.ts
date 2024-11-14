@@ -17,14 +17,15 @@ const getLabelString = async (
   model: string,
   sendFunction: (model: string, prompt: string, imageUrlOrQuery: string) => Promise<string | null>,
   promptGenerator: (input: { gender: Gender; imageUrlOrQuery: string }) => string,
-  gender: Gender,
+  gender: Gender|undefined,
   imageUrlOrQuery: string
-): Promise<{ labelString: string; clothing_type?: ClothingType }> => {
+): Promise<{ labelString: string; clothing_type?: ClothingType; gender?: Gender }> => {
   const MAX_RETRIES = 5;
   let rawLabelString: string | null = null;
   let cleanedLabels: ValidatedRecommendation[] = [];
   let attempts = 0;
   let detectedClothingType: ClothingType | undefined;
+  let detectedGender: Gender | undefined;
 
   while (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
     if (attempts >= MAX_RETRIES) {
@@ -33,7 +34,9 @@ const getLabelString = async (
     }
 
     const prompt = promptGenerator({ gender, imageUrlOrQuery });
+    // console.log("the prompt is: ", prompt);
     rawLabelString = await sendFunction(model, prompt, imageUrlOrQuery);
+    // console.log("rawLabelString: ", rawLabelString);
 
     if (rawLabelString) {
       let clothingTypeString = rawLabelString;
@@ -57,10 +60,15 @@ const getLabelString = async (
           parsedData.clothing_type === "上半身" ? "top" :
           parsedData.clothing_type === "下半身" ? "bottom" :
           undefined;
+        detectedGender =
+          parsedData.gender === "男性" ? "male" :
+          parsedData.gender === "女性" ? "female" :
+          undefined;
         cleanedLabels = validateLabelString(rawLabelString, true, detectedClothingType);
       } catch (parseError) {
         console.error("Failed to parse rawLabelString JSON:", parseError);
         detectedClothingType = undefined;
+        detectedGender = undefined;
       }
     }
 
@@ -73,15 +81,15 @@ const getLabelString = async (
   return {
     labelString: cleanedLabels[0]?.labelString || "",
     clothing_type: detectedClothingType,
+    gender: detectedGender
   };
 };
 
-// Specific function for image search
 const getLabelStringForImageSearch = async (
-  gender: Gender,
+  gender: Gender|undefined,
   model: string,
   imageUrl: string
-): Promise<{ labelString: string; clothing_type?: ClothingType }> => {
+): Promise<{ labelString: string; clothing_type?: ClothingType; gender?: Gender }> => {
   return await getLabelString(
     model,
     async (model, prompt, imageUrl) => await sendImgURLAndPromptToGPT({ model, prompt, imageUrl }),
@@ -93,10 +101,10 @@ const getLabelStringForImageSearch = async (
 
 // Specific function for text search
 const getLabelStringForTextSearch = async (
-  gender: Gender,
+  gender: Gender|undefined,
   model: string,
   query: string
-): Promise<{ labelString: string; clothing_type?: ClothingType }> => {
+): Promise<{ labelString: string; clothing_type?: ClothingType; gender?: Gender }> => {
   return await getLabelString(
     model,
     async (model, prompt) => await sendPromptToGPT({ model, prompt }),

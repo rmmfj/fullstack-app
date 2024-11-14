@@ -44,12 +44,12 @@ const constructPromptForRecommendation = ({
 const constructPromptForImageSearch = ({
   gender,
 }: {
-  gender: Gender;
+  gender: Gender|undefined;
 }): string => {
   const prompt: string = `
-    請仔細觀察這張圖片中性別為${gender}的
-    衣物，並且提供一組詳盡的描述。
-    同時判斷衣物的類型 (上半身或下半身)。
+    請仔細觀察這張圖片中性別為${gender}的衣物，並且提供一組詳盡的描述。
+    同時判斷衣物的類型為上半身或下半身，若是難以判斷的話可輸入“無限制”。
+    若是 gender 為 undefined 的話，請在性別欄位中填入你覺得該衣物比較偏向的性別是男性或女性，難以判斷的話可以填入“無限制”。
     請使用下方 JSON 格式回覆，回答無需包含其他資訊：
     [
       {
@@ -65,7 +65,8 @@ const constructPromptForImageSearch = ({
           "褲管": "[描述]", //選填
           "裙擺": "[描述]" //選填
         },
-        "clothing_type": "[上半身/下半身]"
+        "clothing_type": "[上半身/下半身/無限制]",
+        "gender": "[男性/女性/無限制]"
       }
     ]
   `;
@@ -77,12 +78,13 @@ const constructPromptForTextSearch = ({
   gender,
 }: {
   query: string;
-  gender: Gender;
+  gender: Gender|undefined;
 }): string => {
   return `
     請參考這位性別為${gender}的使用者的需求：${query}。
     若是使用者的需求中沒有特別註明關於顏色的敘述，顏色可以為“無限制”。
-    同時判斷衣物的類型 (上半身或下半身)。
+    同時判斷衣物的類型為上半身或下半身，若是難以判斷的話可輸入“無限制”。
+    若是 gender 為 undefined 的話，請在性別欄位中填入你覺得該衣物比較偏向的性別是男性或女性，難以判斷的話也可以填入“無限制”。
     請使用下方 JSON 格式回覆，回答無需包含其他資訊：
     [
       {
@@ -98,7 +100,8 @@ const constructPromptForTextSearch = ({
           "褲管": "[描述]", //選填
           "裙擺": "[描述]" //選填
         },
-        "clothing_type": "[上半身/下半身]"
+        "clothing_type": "[上半身/下半身/無限制]",
+        "gender": "[男性/女性/無限制]"
       }
     ]
   `;

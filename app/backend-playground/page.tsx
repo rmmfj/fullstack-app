@@ -14,7 +14,7 @@ export default async function Playground2() {
     // console.log(result);
     // let bottom_url = "https://eapzlwxcyrinipmcdoir.supabase.co/storage/v1/object/public/image/image-0eb75e81-a0d5-4a46-8007-c0a16e28c224";
     // let top_url = "https://eapzlwxcyrinipmcdoir.supabase.co/storage/v1/object/public/image/image-00ee47f4-8768-42d9-b68b-29a0702243ea"
-    // const labelString = await getLabelStringForImageSearch("male", "gpt-4o-mini", top_url);
+    // const labelString = await getLabelStringForImageSearch(undefined, "gpt-4o-mini", bottom_url);
     // console.log("backend: ", labelString);
     // const result = await handleImageSearch(labelString, "female", 1, 500, 700, ["H&M", "UNIQLO"], "top");
     // console.log(result);
