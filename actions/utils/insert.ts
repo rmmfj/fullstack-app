@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from "uuid";
 import prisma from "@/prisma/db";
 import { handleDatabaseError } from "../activity";
 
-
 const base64ToBlob = (base64: string): Blob => {
   const byteString = atob(base64.split(",")[1]);
   const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
@@ -31,11 +30,12 @@ const storeImageToStorage = async (base64: string, filename: string) => {
 
   try {
     // Send the image to the image server
-    const response = await fetch("https://clothing.rfjmm.com/upload", {
+    const response = await fetch("https://clothing.rfjmm.com/image/upload", {
       method: "POST",
-      body: formData,
+      body: formData, // need to specify how to parse form data in image server code
       headers: {
-        "Content-Type": "multipart/form-data",
+        Origin: "https://clothing.rfjmm.com",
+        // "Content-Type": "multipart/form-data",
       },
       // headers: {
       //   Authorization: `Bearer ${process.env.IMAGE_SERVER_ACCESS_SECRET}`, // Replace with your shared secret
@@ -58,13 +58,12 @@ const storeImageToStorage = async (base64: string, filename: string) => {
   }
 };
 
-
 // Inserts results into the database
 const insertResults = async (
   results: UnstoredResult[]
 ): Promise<number[] | null> => {
   try {
-    const formattedResults = results.map(result => ({
+    const formattedResults = results.map((result) => ({
       ...result,
       item_id: result.item_id.toString(),
     }));
@@ -73,9 +72,7 @@ const insertResults = async (
       data: formattedResults,
     });
 
-    return insertedResults.count > 0
-      ? results.map((_, index) => index)
-      : [];
+    return insertedResults.count > 0 ? results.map((_, index) => index) : [];
   } catch (error) {
     handleDatabaseError(error, "insertResults");
     return null;
