@@ -48,8 +48,8 @@ const LandingPageHeader = () => {
   const menuItems = [
     { href: "#overview", label: "價值" },
     { href: "#recommendation-feature", label: "穿搭推薦" },
+    { href: "#text-search-feature", label: "文字搜尋" },
     { href: "#image-search-feature", label: "以服搜服" },
-    { href: "#text-search-feature", label: "白話搜尋" },
     { href: "#testimonial", label: "用戶回饋" },
   ];
 

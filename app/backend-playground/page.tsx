@@ -1,4 +1,4 @@
-"use server";
+"use client";
 
 import { handleDatabaseError } from "@/actions/activity";
 
@@ -16,14 +16,19 @@ export default async function Playground2() {
     // console.log(result);
     
 
-  } catch (error) {
-    console.error("Error during backend function calls", error);
+  // } catch (error) {
+  //   console.error("Error during backend function calls", error);
+  // }
+
+  const generateEmbedding = async () => {
+    await handler();
   }
 
   return (
     <div>
       <h1>Playground2</h1>
       <p>Check console for output</p>
+      <button onClick={generateEmbedding}>generateEmbedding</button>
     </div>
   );
 }

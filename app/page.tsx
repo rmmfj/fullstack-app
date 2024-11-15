@@ -27,8 +27,8 @@ export default function LandingPage() {
         <OverviewSection  />
       </section>
       <RecommendationSection />
-      <ImageSearchSection />
       <TextSearchSection />
+      <ImageSearchSection />
       <TestimonialSection />
       {/* Floating Button */}
       

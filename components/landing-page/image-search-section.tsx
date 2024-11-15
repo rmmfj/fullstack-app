@@ -14,8 +14,8 @@ const ImageSearchSection = () => {
       }
       buttonText="探索相似款式！"
       buttonLink="/search"
-      reverse={true}
-      darkerBackground={true}
+      reverse={false}
+      darkerBackground={false}
     >
       內容待生成
     </Section>

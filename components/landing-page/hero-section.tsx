@@ -18,13 +18,7 @@ const HeroSection = () => {
       <div className='relative z-10 md:text-start text-center'>
         <h1 className='flex text-2xl md:text-4xl font-bold mb-4 animate-fade-in-up'>
           <AnimatedTextCharacter text='輕鬆找到屬於你的' />
-          <motion.span
-            initial={{ x: 200, opacity: 0, scale: 0 }}
-            animate={{ x: 0, opacity: 1, scale: 1 }}
-            className='animate-[pulse_0.8s_ease-out_infinite] bg-gradient-to-r from-indigo-200 to-indigo-500 bg-clip-text text-transparent'
-          >
-            時尚風格
-          </motion.span>
+          <div className="text-indigo-400">時尚風格</div>
         </h1>
         <AnimatedTextCharacter
           className='border-l-4 border-black md:pl-4 pl-2 text-sm md:text-lg mb-16 max-w-3xl mx-auto animate-fade-in-up animation-delay-300'
@@ -33,13 +27,19 @@ const HeroSection = () => {
         <motion.div className="flex items-center justify-center w-full" initial={{ scale: 0 }} whileInView={{ scale: 1 }}>
           <Button
             // size='lg'
-            className='bg-indigo-400 hover:bg-indigo-400/80 text-white animate-fade-in-up animation-delay-600 py-6 px-10'
+            className='bg-indigo-200 hover:bg-indigo-300 text-white animate-fade-in-up animation-delay-600 py-6 px-10 border-r-4 border-b-4 border-indigo-500'
             onClick={handleClick}
           >
             {/* <WandSparkles className='text-indigo-600 mr-2 h-4 w-4' /> */}
-            <WandSparkles className='text-white mr-2 h-4 w-4' />
+            <WandSparkles className='text-indigo-600 mr-2 h-4 w-4' />
             {/* <p className='text-indigo-600 text-lg'>手刀進入！</p> */}
-            <p className='text-white text-lg'>立即體驗</p>
+            <motion.span
+            initial={{ x: 200, opacity: 0, scale: 0 }}
+            animate={{ x: 0, opacity: 1, scale: 1 }}
+            className='animate-[pulse_0.8s_ease-out_infinite] bg-gradient-to-r from-indigo-600 to-indigo-700 text-lg bg-clip-text text-transparent'
+          >
+            立即體驗
+          </motion.span>
           </Button>
         </motion.div>
       </div>

@@ -214,6 +214,20 @@ export default function UploadPage() {
     }, 1000);
   }, []);
 
+  const handleFormSubmission = async () => {
+    setCurrentStep(3);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleConfirm = useCallback(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
   const onSubmit = async (data: any) => {
     setLoading(true);
     setIsConfirmed(true);
