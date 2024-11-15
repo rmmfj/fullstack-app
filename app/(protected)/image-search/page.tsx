@@ -202,6 +202,7 @@ export default function UploadPage() {
     setLoading(true);
     console.log(">> submit");
     setIsConfirmed(true);
+    const file = data.uploadedImage[0];
     const reader = new FileReader();
     reader.onloadend = async () => {
       const supabase = createClient();
@@ -209,7 +210,7 @@ export default function UploadPage() {
         const base64 = reader.result;
         const filename = file.name;
         try {
-          const imageUrl = await storeImageToStorage(base64);
+          const imageUrl = await storeImageToStorage(base64, filename);
           setImage(imageUrl);
           setGender(data.gender);
           const label_string = await getLabelStringForImageSearch(gender, "gpt-4o-mini", imageUrl);
