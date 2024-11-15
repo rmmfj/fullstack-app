@@ -28,15 +28,15 @@ const storeImageToStorage = async (base64: string, filename: string) => {
     // Send the image to the image server
     const formData = new FormData();
     formData.append("file", blob, filename);
+    const ACCESS_SECRET = process.env.ACCESS_SECRET
 
     const response = await fetch("https://clothing.rfjmm.com/image/upload", {
       method: "POST",
       body: formData,
       headers: {
-        Origin: "https://clothing.rfjmm.com",
+        Authorization: `Bearer ${ACCESS_SECRET}`, // Replace with your actual ACCESS_SECRET
       },
     });
-
 
     if (!response.ok) {
       throw new Error(`Failed to upload image: ${response.statusText}`);
@@ -53,6 +53,7 @@ const storeImageToStorage = async (base64: string, filename: string) => {
     throw error;
   }
 };
+
 
 // Inserts results into the database
 const insertResults = async (
