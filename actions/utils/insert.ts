@@ -34,7 +34,7 @@ const storeImageToStorage = async (base64: string, filename: string) => {
       method: "POST",
       body: formData,
       headers: {
-        Authorization: `Bearer ${IMAGE_SERVER_ACCESS_SECRET}`, // Replace with your actual ACCESS_SECRET
+        Authorization: `Bearer ${IMAGE_SERVER_ACCESS_SECRET}`,
       },
     });
 
