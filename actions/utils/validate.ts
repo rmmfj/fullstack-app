@@ -16,14 +16,28 @@ const validateLabelString = (
 
     const cleanedRecommendations = recommendations.replace(/```json\s*|\s*```/g, "").trim();
 
-    if (!cleanedRecommendations.startsWith("[")) {
-      console.log("Cleaned recommendations does not start with '[':", cleanedRecommendations);
+    // if (!cleanedRecommendations.startsWith("[")) {
+    //   console.log("Cleaned recommendations does not start with '[':", cleanedRecommendations);
+    //   return [];
+    // }
+
+    const firstBracketIndex = cleanedRecommendations.indexOf("[");
+
+    if (firstBracketIndex === -1) {
+      console.log("No '[' found in recommendations:", cleanedRecommendations);
+      return [];
+    }
+    
+    const validRecommendations = cleanedRecommendations.slice(firstBracketIndex).trim();
+    
+    if (!validRecommendations.startsWith("[")) {
+      console.log("Valid recommendations does not start with '[':", validRecommendations);
       return [];
     }
 
     let recommendationsArray;
     try {
-      recommendationsArray = JSON.parse(cleanedRecommendations);
+      recommendationsArray = JSON.parse(validRecommendations);
     } catch (parseError) {
       console.error("Failed to parse recommendations JSON:", parseError);
       return [];
