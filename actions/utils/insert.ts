@@ -35,11 +35,14 @@ const storeImageToStorage = async (base64: string, filename: string) => {
       body: formData,
       headers: {
         Authorization: `Bearer ${IMAGE_SERVER_ACCESS_SECRET}`,
+        Origin: "https://clothing.rfjmm.com",
       },
     });
-
+    console.log("reponse: ", response);
     if (!response.ok) {
       throw new Error(`Failed to upload image: ${response.statusText}`);
+    } else {
+      console.log("i am okaaaaay");
     }
 
     // Parse the JSON response
@@ -53,7 +56,6 @@ const storeImageToStorage = async (base64: string, filename: string) => {
     throw error;
   }
 };
-
 
 // Inserts results into the database
 const insertResults = async (
