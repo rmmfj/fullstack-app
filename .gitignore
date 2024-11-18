@@ -12,6 +12,7 @@ package-lock.json
 
 /app/chc-playground
 /app/playground
+/app/backend-playground
 
 # testing
 /coverage# Update these with your Supabase details from your project settings > API
