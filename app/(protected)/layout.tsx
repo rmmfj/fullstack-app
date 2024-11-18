@@ -10,7 +10,6 @@ export default async function HomeLayout({
   children: React.ReactNode;
 }) {
   const supabase = createClient();
-
   // Get the user data
   const {
     data: { user },
