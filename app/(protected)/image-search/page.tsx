@@ -216,13 +216,14 @@ export default function UploadPage() {
     setLoading(true);
     console.log(">> submit");
     setIsConfirmed(true);
-    const filename = data.uploadedImage.name;
     const reader = new FileReader();
     reader.onloadend = async () => {
       const supabase = createClient();
       console.log(reader.result);
       if (typeof reader.result === "string") {
         const base64 = reader.result;
+        const filename = data.uploadedImage.name;
+        console.log(filename);
         try {
           const imageUrl = await storeImageToStorage(base64, filename);
           setImage(imageUrl);
