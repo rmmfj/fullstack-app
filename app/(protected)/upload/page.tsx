@@ -9,7 +9,6 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import imageCompression from 'browser-image-compression';
 import { motion } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
@@ -26,14 +25,13 @@ const schema = z.object({
   clothingType: z.enum(["top", "bottom"], {
     message: "請選擇服飾類型",
   }),
-  gender: z.enum(["male", "female, neutral"], { message: "請選擇性別" }),
-  model: z.string().default("gpt-4o"),
+  gender: z.enum(["male", "female", "neutral"], { message: "請選擇性別" }),
+  model: z.string().default("gpt-4o-mini"),
   uploadedImage: (typeof window === "undefined"
     ? z.any()
-    : z.instanceof(FileList, {
+    : z.instanceof(Blob, {
         message: "請上傳圖片",
-      })
-  ).refine((files) => files.length > 0, "請上傳圖片"),
+    }))
 });
 
 const ProgressBar = ({
@@ -94,17 +92,6 @@ const FormFields = ({ nextStep }: { nextStep: () => void }) => {
   );
 };
 
-const toHHMMSS = (secs: number) => {
-  var hours = Math.floor(secs / 3600);
-  var minutes = Math.floor(secs / 60) % 60;
-  var seconds = secs % 60;
-
-  return [hours, minutes, seconds]
-    .map((v) => (v < 10 ? "0" + v : v))
-    .filter((v, i) => v !== "00" || i > 0)
-    .join(":");
-};
-
 // Overview Component
 const Overview = ({
   isConfirmed,
@@ -118,7 +105,7 @@ const Overview = ({
       <h1 className='w-full text-start text-2xl text-gray-600'>➌ 確認上傳</h1>
       <div>
         <Image
-          src={formData.uploadedImage ? URL.createObjectURL(formData.uploadedImage[0]) : 'https://eapzlwxcyrinipmcdoir.supabase.co/storage/v1/object/public/image/image-018f80af-65bb-48fd-ba2f-43051785c660'}
+          src={formData.uploadedImage ? URL.createObjectURL(formData.uploadedImage) : 'https://eapzlwxcyrinipmcdoir.supabase.co/storage/v1/object/public/image/image-018f80af-65bb-48fd-ba2f-43051785c660'}
           alt='Uploaded'
           className='w-80 h-80 object-cover rounded-lg mb-4'
           width={128}
@@ -142,8 +129,7 @@ const Overview = ({
 
 function ConfirmButton({ isConfirmed }: { isConfirmed: boolean }) {
   const router = useRouter();
-  const [secondsSpent, setSecondsSpent] = useState<number>(0);
-  console.log('isConfirmed', isConfirmed);
+  const { reset, trigger, getValues,  formState: { errors }, } = useFormContext();
   return (
     <motion.div
       whileTap={{ scale: 0.95 }}
@@ -162,18 +148,22 @@ function ConfirmButton({ isConfirmed }: { isConfirmed: boolean }) {
         )}
         {...(isConfirmed ? {} : { type: 'submit'})}
         onClick={async () => {
-          if (secondsSpent > 0) {
+          if (isConfirmed) {
+            reset();
             router.push('/upload?step=1');
           } else {
-            setInterval(() => {
-              setSecondsSpent((s) => s + 1);
-            }, 1000);
+            console.log('formData', getValues());
+            console.log('validate', await trigger());
+            console.log('validate gender', await trigger('gender'));
+            console.log('validate clothingType', await trigger('clothingType'));
+            console.log('validate uploadedImage', await trigger('uploadedImage'));
+            console.log('errors', errors);
           }
         }}
-        loading={secondsSpent > 0}
+        loading={isConfirmed}
         disabled={false}
       >
-        {secondsSpent > 0
+        {isConfirmed
           ? `終止並退出`
           : "一鍵成為穿搭達人！"}
       </LoadingButton>
@@ -189,7 +179,6 @@ export default function UploadPage() {
   const methods = useForm({
     resolver: zodResolver(schema),
   });
-  const [loading, setLoading] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
@@ -214,22 +203,7 @@ export default function UploadPage() {
     }, 1000);
   }, []);
 
-  const handleFormSubmission = async () => {
-    setCurrentStep(3);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  const handleConfirm = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-
   const onSubmit = async (data: any) => {
-    setLoading(true);
     setIsConfirmed(true);
     console.log(">> submit");
     const file = data.uploadedImage[0];
@@ -261,19 +235,8 @@ export default function UploadPage() {
         }
       }
     };
-
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920,
-      useWebWorker: true,
-    }
-    try {
-      const compressedFile = await imageCompression(data.uploadedImage[0], options);
-      reader.readAsDataURL(compressedFile);
-  
-    } catch (error) {
-      console.log(error);
-    }
+    
+    reader.readAsDataURL(data.uploadedImage);
     
     const NUM_MAX_SUGGESTION: number = 3;
     const NUM_MAX_ITEM: number = 10;

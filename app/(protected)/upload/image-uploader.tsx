@@ -1,4 +1,5 @@
 "use client";
+import imageCompression from "browser-image-compression";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -14,7 +15,7 @@ const ImageUploader = ({
   const {
     register,
     setValue,
-    watch,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
@@ -27,12 +28,23 @@ const ImageUploader = ({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     onImageUpload();
     const files = e.target.files;
+    const options = {
+      maxSizeMB: .1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      fileType: "image/jpeg"
+    }
     if (files && files[0]) {
-      setValue("uploadedImage", files);
-      setPreview(URL.createObjectURL(files[0]));
+      const compressedFile = await imageCompression(files[0], options);
+      console.log('uploaded file(s):', files);
+      console.log('compressed file(s):', compressedFile);
+      setValue("uploadedImage", compressedFile);
+      setPreview(URL.createObjectURL(compressedFile));
+      console.log(getValues());
     }
   };
 
