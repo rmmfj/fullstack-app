@@ -11,6 +11,8 @@ const sendImgURLAndPromptToGPT = async ({
   prompt: string;
   imageUrl: string;
 }): Promise<string | null> => {
+  console.time("sendImgURLAndPromptToGPT");
+
   const NUM_MAX_RETRIES = 5;
   const RETRY_BASE_WAIT_TIME = 600;
 
@@ -40,6 +42,7 @@ const sendImgURLAndPromptToGPT = async ({
     }
   }
 
+  console.timeEnd("sendImgURLAndPromptToGPT");
   return null;
 };
 
@@ -50,6 +53,9 @@ const sendPromptToGPT = async ({
   model: string;
   prompt: string;
 }): Promise<string | null> => {
+  console.time("sendPromptToGPT");
+  
+
   const NUM_MAX_RETRIES = 5;
   
   for (let numRetries = 0; numRetries < NUM_MAX_RETRIES; ++numRetries) {
@@ -68,12 +74,15 @@ const sendPromptToGPT = async ({
     }
   }
 
+  console.timeEnd("sendPromptToGPT");
+
   return null;
 };
 
 const checkImageAvailability = async (imageUrl: string): Promise<boolean> => {
   try {
     const response = await fetch(imageUrl, { method: "HEAD" });
+    console.log(response);
     return response.ok;
   } catch (e) {
     console.error(`Error checking image availability for ${imageUrl}:`, e);

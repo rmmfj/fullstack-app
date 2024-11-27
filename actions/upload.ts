@@ -32,11 +32,15 @@ const handleRecommendation = async (
   imageUrl: string
 ): Promise<number> => {
   try {
+    console.time("checkpoint 0");
+    console.time("checkpoint 1");
     let recommendations: string | null = null;
     let cleanedRecommendations: ValidatedRecommendation[] = [];
     const maxRetries = 5;
     let attempts = 0;
+    console.timeEnd("checkpoint 1");
 
+    console.time("checkpoint 2");
     while (recommendations?.length === 0 || cleanedRecommendations.length === 0) {
       if (attempts >= maxRetries) {
         console.error("Max retries reached for handling recommendation.");
@@ -51,6 +55,9 @@ const handleRecommendation = async (
       cleanedRecommendations = validateLabelString(recommendations, clothingType);
       attempts++;
     }
+    console.timeEnd("checkpoint 2");
+
+    console.time("checkpoint 3");
     const uploadId: number = await insertUpload(imageUrl, userId);
     const paramId: number = await insertParam(gender, clothingType, model);
     const recommendationId: number = await insertRecommendation({
@@ -58,7 +65,9 @@ const handleRecommendation = async (
       uploadId,
       userId,
     });
+    console.timeEnd("checkpoint 3");
 
+    console.time("checkpoint 4");
     await Promise.all(cleanedRecommendations.map(async (rec) => {
       const suggestionId = await insertSuggestion({
         recommendationId,
@@ -78,6 +87,8 @@ const handleRecommendation = async (
       return 0;
     }));
 
+    console.time("checkpoint 4");
+    console.timeEnd("checkpoint 0");
     return recommendationId;
   } catch (error) {
     handleDatabaseError(error, "handleRecommendation");
