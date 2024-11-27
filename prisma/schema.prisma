@@ -90,7 +90,7 @@ model Profile {
 }
 
 model Recommendation {
-  id          Int        @id @default(autoincrement())
+  id          String     @id @default(uuid())
   created_at  DateTime   @default(now())
   param_id    Int?
   upload_id   Int?
@@ -132,7 +132,7 @@ model Suggestion {
   created_at        DateTime   @default(now())
   description       String?
   label_string      String?
-  recommendation_id Int?
+  recommendation_id String?
   style_name        String?
 
   recommendation  Recommendation? @relation(fields: [recommendation_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -178,7 +178,7 @@ model UserActivityItem {
 model UserActivityRecommendation {
   id               Int      @id @default(autoincrement())
   user_id           String?
-  recommendation_id Int?
+  recommendation_id String?
   activity_type     String?
   activity_time     DateTime @default(now())
 

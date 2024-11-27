@@ -220,16 +220,17 @@ export default function UploadPage() {
           const {
             data: { user },
           } = await supabase.auth.getUser();
+          console.log('ok1')
           const recommendationId = await handleRecommendation(
             data.clothingType,
             data.gender,
             data.model,
-            user?.id as string,
+            !user ? null : user.id,
             NUM_MAX_SUGGESTION,
             NUM_MAX_ITEM,
             imageUrl
           );
-
+          console.log('ok2')
           router.push(`/recommendation/${recommendationId}`);
         } catch (error) {
           console.error("Error in onSubmit:", error);

@@ -6,8 +6,6 @@ import { Copy, EllipsisVertical, Heart, ScanText, Shirt, ShoppingBag, TextSearch
 import Image from "next/image";
 import Link from "next/link";
 
-
-
 import { handleFavorite } from "@/actions/favorite";
 import {
   Carousel,
@@ -25,8 +23,12 @@ import { Badge } from "../ui/badge";
 
 const PROVIDER_CLASSNAME_MAPPING: { [k: string]: string } = {
   'UNIQLO': 'bg-blue-100 hover:bg-blue-100 text-gray-800',
-  'Fifty Percent': 'bg-rose-100 hover:bg-rose-100 text-gray-800',
-  'H&M': 'bg-violet-100 hover:bg-violet-100 text-vigray-800'
+  'FIFTY PERCENT': 'bg-rose-100 hover:bg-rose-100 text-gray-800',
+  'H&M': 'bg-violet-100 hover:bg-violet-100 text-vigray-800',
+  'PAZZO': 'bg-teal-100 hover:bg-teal-100 text-gray-800',
+  'Meier.Q': 'bg-fuchsia-100 hover:bg-fuchsia-100 text-gray-800',
+  'ZARA': 'bg-amber-100 hover:bg-amber-100 text-gray-800',
+  'lativ': 'bg-sky-100 hover:bg-sky-100 text-gray-800',
 };  
 
 

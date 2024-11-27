@@ -24,7 +24,7 @@ const defaultUrl =
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Clothing Recommendation",
-  description: "Tin can, can you?",
+  description: "一鍵穿新",
 };
 
 const RECOMMENDATION_STEPS: Step[] = [

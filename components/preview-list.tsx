@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { RecommendationPreview } from "@/type";
 import { useRouter } from "next/navigation";
 import PreviewCard from "./preview-card";
@@ -8,26 +7,18 @@ import PreviewCard from "./preview-card";
 
 const PreviewList = ({
   title,
-  id,
   previews,
-  index,
   description,
 }: {
   title: string;
-  id: string;
   previews: RecommendationPreview[];
-  index: number;
   description: string;
 }) => {
   const router = useRouter();
 
   return (
     <div
-      id={id}
-      className={cn(
-        "px-4 flex flex-col gap-6 items-center pt-6",
-        index !== 0 && "border-t-[1px] border-gray-800/30"
-      )}
+      className="px-4 flex flex-col gap-6 items-center pt-6"
     >
       <h3 className='text-2xl font-semibold text-primary border-b-2 border-indigo-400'>{title}</h3>
       {description && (

@@ -22,8 +22,6 @@ const HistoryPage = async () => {
       </div>
       <PreviewList
         title='穿搭推薦'
-        id={""}
-        index={0}
         previews={previews}
         description='您過去上傳的推薦照片都會顯示在此，點擊圖片查看推薦結果'
       />

@@ -31,9 +31,8 @@ const getResults = async (suggestionId: number): Promise<ResultTable[] | null> =
 };
 
 // Fetches suggestions based on a recommendation ID
-const getSuggestion = async (inputRecommendationId: number): Promise<SuggestionTable[] | null> => {
+const getSuggestion = async (recommendationId: string): Promise<SuggestionTable[] | null> => {
   try {
-    const recommendationId = inputRecommendationId ? Number(inputRecommendationId) : null;
     const suggestions = await prisma.suggestion.findMany({
       where: { recommendation_id: recommendationId },
     });
@@ -44,11 +43,10 @@ const getSuggestion = async (inputRecommendationId: number): Promise<SuggestionT
 };
 
 // Fetches recommendation by ID
-const getRecommendationById = async (inputRecommendationId: number): Promise<RecommendationTable | null> => {
+const getRecommendationById = async (recommendationId: string): Promise<RecommendationTable | null> => {
   try {
-    const recommendationId = inputRecommendationId ? Number(inputRecommendationId) : null;
     const recommendation = await prisma.recommendation.findUnique({
-      where: { id: recommendationId as number },
+      where: { id: recommendationId },
     });
     return recommendation ?? null;
   } catch (error) {
@@ -223,7 +221,7 @@ const getSeriesForRecommendation = async (
   originalItemIds: string[],
   gender: string,
   clothingType: string,
-  user_id: string
+  user_id: string | null
 ): Promise<Series[]|null> => {
   try {
     // console.time("getSeriesForRecommendation");
@@ -235,11 +233,12 @@ const getSeriesForRecommendation = async (
   
     const uniqueSeriesIds = Array.from(new Set(series_ids));
     const seriesArray: Series[] = [];
-    const favorites = await prisma.favorite.findMany({
+
+    const favorites = (user_id === null ? [] : await prisma.favorite.findMany({
       where: { 
         user_id: user_id, 
         series_id: { in: uniqueSeriesIds } },
-    });
+    }));
 
     const favoriteSeriesIds = new Set(favorites.map(fav => fav.series_id));
 

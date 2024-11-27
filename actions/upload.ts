@@ -1,6 +1,6 @@
 "use server";
 import prisma from "@/prisma/db";
-import { Recommendation, UnstoredResult, ValidatedRecommendation } from "@/type";
+import { UnstoredResult, ValidatedRecommendation } from "@/type";
 import { handleDatabaseError } from "./activity";
 import { sendImgURLAndPromptToGPT } from "./utils/chat";
 import {
@@ -11,8 +11,7 @@ import {
   insertUpload,
 } from "./utils/insert";
 import {
-  semanticSearchForRecommendation,
-  semanticSearchWithoutLogin
+  semanticSearchForRecommendation
 } from "./utils/matching";
 import {
   constructPromptForRecommendation,
@@ -26,11 +25,11 @@ const handleRecommendation = async (
   clothingType: ClothingType,
   gender: Gender,
   model: string,
-  userId: string,
+  userId: string | null,
   numMaxSuggestion: number,
   numMaxItem: number,
   imageUrl: string
-): Promise<number> => {
+): Promise<string | null> => {
   try {
     console.time("checkpoint 0");
     console.time("checkpoint 1");
@@ -44,30 +43,31 @@ const handleRecommendation = async (
     while (recommendations?.length === 0 || cleanedRecommendations.length === 0) {
       if (attempts >= maxRetries) {
         console.error("Max retries reached for handling recommendation.");
-        return -1;
+        return "";
       }
       console.log(`handleRecommendation while loop at iteration ${attempts}`);
       const prompt = constructPromptForRecommendation({ clothingType, gender, numMaxSuggestion });
+      console.log('flag1');
       recommendations = await sendImgURLAndPromptToGPT({ model, prompt, imageUrl });
-
+      console.log('flag2');
+      
       if (!recommendations) continue;
-
+      
       cleanedRecommendations = validateLabelString(recommendations, clothingType);
       attempts++;
     }
-    console.timeEnd("checkpoint 2");
-
-    console.time("checkpoint 3");
+    console.log('flag3');
     const uploadId: number = await insertUpload(imageUrl, userId);
+    console.log('flag4');
     const paramId: number = await insertParam(gender, clothingType, model);
-    const recommendationId: number = await insertRecommendation({
+    console.log('flag5');
+    const recommendationId: string = await insertRecommendation({
       paramId,
       uploadId,
       userId,
     });
-    console.timeEnd("checkpoint 3");
-
-    console.time("checkpoint 4");
+    console.log('flag6');
+    
     await Promise.all(cleanedRecommendations.map(async (rec) => {
       const suggestionId = await insertSuggestion({
         recommendationId,
@@ -86,90 +86,16 @@ const handleRecommendation = async (
       await insertResults(results as UnstoredResult[]);
       return 0;
     }));
-
-    console.timeEnd("checkpoint 4");
-    console.timeEnd("checkpoint 0");
+    console.log('flag7');
+    
     return recommendationId;
   } catch (error) {
     handleDatabaseError(error, "handleRecommendation");
-    return -1;
-  }
-};
-
-const handleRecommendationWithoutLogin = async (
-  clothingType: ClothingType,
-  gender: Gender,
-  model: string,
-  numMaxSuggestion: number,
-  numMaxItem: number,
-  imageUrl: string
-): Promise<Recommendation[] | null> => {
-  try {
-    let rawLabelString: string | null = null;
-    let cleanedLabels: ValidatedRecommendation[] = [];
-    const maxRetries = 5;
-    let attempts = 0;
-
-    while (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
-      if (attempts >= maxRetries) {
-        console.error("Max retries reached for hendling recommendation without login.");
-        return null;
-      }
-      console.log(`handleRecommendationWithoutLogin while loop at iteration ${attempts}`);
-      const prompt = constructPromptForRecommendation({ clothingType, gender, numMaxSuggestion });
-      rawLabelString = await sendImgURLAndPromptToGPT({ model, prompt, imageUrl });
-
-      if (rawLabelString) {
-        cleanedLabels = validateLabelString(rawLabelString, clothingType);
-      }
-      console.log("GPT recommendations= ", cleanedLabels);
-
-      if (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
-        console.warn("Retrying sendImgURLAndPromptToGPT due to invalid results...");
-      }
-      attempts++;
-    }
-    const recommendations: Recommendation[] = [];
-
-    for (const cleanedLabel of cleanedLabels) {
-      const labelString = cleanedLabel.labelString;
-      const description = cleanedLabel.description;
-
-      const results = await semanticSearchWithoutLogin({
-        suggestedLabelString: labelString,
-        numMaxItem,
-        gender,
-        clothing_type: clothingType,
-      });
-
-      if (results) {
-        const recommendation: Recommendation = {
-          clothingType: clothingType,
-          gender: gender,
-          model: model,
-          imageUrl: imageUrl,
-          styles: {
-            default: {
-              series: results,
-              description: description,
-            },
-          },
-        };
-        recommendations.push(recommendation);
-      } else {
-        console.error("No results found in semanticSearchWithoutLogin for label:", labelString);
-        return null;
-      }
-    }
-
-    return recommendations;
-  } catch (error) {
-    handleDatabaseError(error, "handleRecommendationWithoutLogin");
     return null;
   }
 };
 
-const stopAction = async (recommendationId: number) => {
+const stopAction = async (recommendationId: string) => {
   try {
     const suggestions = await prisma.suggestion.findMany({
       where: { recommendation_id: recommendationId },
@@ -208,5 +134,5 @@ const stopAction = async (recommendationId: number) => {
   }
 };
 
-export { handleRecommendation, handleRecommendationWithoutLogin, stopAction };
+export { handleRecommendation, stopAction };
 

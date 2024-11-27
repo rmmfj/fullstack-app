@@ -4,7 +4,7 @@ import { createProfile } from "@/actions/utils/user";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function HomeLayout({
+export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -20,7 +20,7 @@ export default async function HomeLayout({
   if (error || !user) {
     // Redirect the user to the login page if not authenticated
     redirect("/login");
-    return null; // To prevent rendering if the user is being redirected
+    return null; // T o prevent rendering if the user is being redirected
   }
 
   await createProfile(user.id);

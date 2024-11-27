@@ -3,7 +3,7 @@ import prisma from "@/prisma/db";
 
 const insertActivityRecommendation = async (
   user_id: string,
-  recommendation_id: number,
+  recommendation_id: string,
   activity_type: string
 ): Promise<number | null> => {
   try {
@@ -19,7 +19,6 @@ const insertActivityRecommendation = async (
     });
     return activity.id;
   } catch (error) {
-    console.log('fuck', error);
     return handleDatabaseError(error, "insertActivityRecommendation");
   }
 };
