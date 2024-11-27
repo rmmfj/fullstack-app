@@ -18,7 +18,7 @@ export interface Recommendation {
   model: string;
   imageUrl: string;
   styles: {
-    [styleName: string]: { suggestion_id: number, series: Series[], description: string };
+    [styleName: string]: { suggestion_id?: number, series: Series[], description: string };
   };
 }
 

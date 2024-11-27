@@ -334,7 +334,7 @@ export default function UploadPage() {
                 title="搜尋結果"
                 description={""}
                 series={results}
-                id={""}
+                id={0}
                 index={0}
                 expandOnMount={true}
                 expandable={false}
