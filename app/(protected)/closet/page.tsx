@@ -23,7 +23,7 @@ const ClosetPage = async () => {
             title='我的最愛'
             description={'你收藏的服飾都會被收納在這裡'}
             series={favorites}
-            id={""}
+            id={0}
             index={0}
             expandOnMount={true}
             expandable={false}

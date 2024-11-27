@@ -38,7 +38,7 @@ const ItemList = ({
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      await insertActivitySuggestion(user?.id as string, id, 'click_see_more');
+      await insertActivitySuggestion(user?.id as string, Number(id), 'click_see_more');
     }
     setIsExpanded(!isExpanded);
   };
