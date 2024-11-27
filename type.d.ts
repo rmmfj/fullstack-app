@@ -1,4 +1,4 @@
-import { Item, Param, Profile, Recommendation, Result, Suggestion, Upload, Favorite } from "@prisma/client";
+import { Favorite, Item, Param, Profile, Recommendation, Result, Suggestion, Upload } from "@prisma/client";
 
 export type ItemTable = Item;
 export type ParamTable = Param;
@@ -18,9 +18,10 @@ export interface Recommendation {
   model: string;
   imageUrl: string;
   styles: {
-    [styleName: string]: { series: Series[], description: string };
+    [styleName: string]: { suggestion_id: number, series: Series[], description: string };
   };
 }
+
 export interface SearchResult {
   series: Series[];
   totalPages: number;

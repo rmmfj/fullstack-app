@@ -82,6 +82,7 @@ const getRecommendationRecordById = async (
       }
 
       recommendation_record.styles![styleName] = {
+        suggestion_id: s.id,
         series,
         description
       };

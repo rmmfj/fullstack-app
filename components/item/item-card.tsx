@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "../ui/use-toast";
 
+import { insertActivityItem } from "@/actions/activity";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -48,6 +49,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import { createClient } from "@/utils/supabase/client";
 
 const parseLabelString = (input: string) => {
   const result: { [key: string]: string } = {};
@@ -192,6 +194,15 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
     setIsFavorite(!isFavorite);
     await handleFavorite(userId, series.items[0].series_id);
   }
+
+  const recordActivity = (activityType: string) => (async () => {
+    console.log('activitiy item')
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    await insertActivityItem(user?.id as string, series.items[0].id, activityType);
+  });
   
   return (
     <Card className='w-40 md:w-64 rounded-none flex flex-col justify-between h-fit gap-1 shadow-none border-0'>
@@ -212,6 +223,7 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
             <div className='relative w-full'>
               <Link
                 target="_blank"
+                onClick={recordActivity('click_see_more')}
                 href={
                   series.items[0].external_link ? series.items[0].external_link : "#"
                 }
@@ -233,8 +245,8 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
                   ))}
                 </CarouselMainContainer>
               </Link>
-              <div className='relative w-full bottom-2 left-1/2 -translate-x-1/2'>
-                <CarouselThumbsContainer className='gap-x-1 w-full'>
+              <div className='relative w-40 md:w-64 bottom-2 left-1/2 -translate-x-1/2'>
+                <CarouselThumbsContainer onClick={recordActivity('switch_color')} className='gap-x-1 w-full'>
                   {series.items.map((_, index) => (
                     <CarouselIndicator
                       key={index}
@@ -249,6 +261,7 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
           <div className='relative w-full h-40 md:h-64'>
             <Link
               target="_blank"
+              onClick={recordActivity('click_see_more')}
               href={
                 series.items[0].external_link ? series.items[0].external_link : "#"
               }
@@ -267,6 +280,7 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
       </div>
       <Link
         target="_blank"
+        onClick={recordActivity('click_see_more')}
         href={
           series.items[0].external_link ? series.items[0].external_link : "#"
         }

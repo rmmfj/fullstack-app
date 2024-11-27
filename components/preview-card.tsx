@@ -1,7 +1,9 @@
 "use client";
 
+import { insertActivityRecommendation } from "@/actions/activity";
 import { Card } from "@/components/ui/card";
 import { RecommendationPreview } from "@/type";
+import { createClient } from "@/utils/supabase/client";
 import Image from 'next/image';
 import Link from "next/link";
 
@@ -13,6 +15,19 @@ const PreviewCard = ({ preview }: { preview: RecommendationPreview }) => {
         <div className='relative w-full h-40 md:h-64'>
           <Link
             href={`/recommendation/${preview.id}`}
+            onClick={async () => {
+              const supabase = createClient();
+              const {
+                data: { user },
+                error,
+              } = await supabase.auth.getUser();
+
+              if (!user?.id) return;
+              
+              console.log(user?.id as string, preview.id, 'click_history')
+              await insertActivityRecommendation(user?.id as string, preview.id, 'click_history')
+              console.log('activity log');
+            }}
           >
             <Image
               src={preview.upload.image_url as string}

@@ -56,7 +56,7 @@ const RecommendationPage = async ({
           return (
             <ItemList
               key={`recommended-style-${index}`}
-              id={recommendedStyle}
+              id={recommendation.styles[recommendedStyle].suggestion_id}
               index={index}
               title={recommendedStyle}
               description={recommendation.styles[recommendedStyle].description}

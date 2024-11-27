@@ -350,7 +350,7 @@ const CarouselPrevious = forwardRef<
     orientation,
     direction,
   } = useCarousel();
-
+  // const onClick = props.onClick as () => Promise<void>;
   const scroll = direction === "rtl" ? scrollNext : scrollPrev;
   const canScroll = direction === "rtl" ? canScrollNext : canScrollPrev;
   return (
@@ -388,6 +388,7 @@ const CarouselNext = forwardRef<
     orientation,
     direction,
   } = useCarousel();
+  // const onClick = props.onClick as () => Promise<void>;
   const scroll = direction === "rtl" ? scrollPrev : scrollNext;
   const canScroll = direction === "rtl" ? canScrollPrev : canScrollNext;
   return (

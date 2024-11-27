@@ -7,6 +7,9 @@ const insertActivityRecommendation = async (
   activity_type: string
 ): Promise<number | null> => {
   try {
+    console.log(user_id,
+      recommendation_id,
+      activity_type,);
     const activity = await prisma.userActivityRecommendation.create({
       data: {
         user_id,
@@ -16,6 +19,7 @@ const insertActivityRecommendation = async (
     });
     return activity.id;
   } catch (error) {
+    console.log('fuck', error);
     return handleDatabaseError(error, "insertActivityRecommendation");
   }
 };

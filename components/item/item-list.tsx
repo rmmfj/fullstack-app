@@ -1,12 +1,12 @@
 "use client";
 
+import { insertActivitySuggestion } from "@/actions/activity";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Series } from "@/type";
-import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import ItemCard from "./item-card";
-import { createClient } from "@/utils/supabase/client";
 
 const parseTags = (stylePreferencesString: string) => {
   return stylePreferencesString.split(",");
@@ -22,7 +22,7 @@ const ItemList = ({
   expandable=true,
 }: {
   title: string;
-  id: string;
+  id: number;
   series: Series[];
   index: number;
   description: string;
@@ -32,7 +32,14 @@ const ItemList = ({
   const [isExpanded, setIsExpanded] = useState(expandOnMount || false);
   const [userId, setUserId] = useState<string | null>(null);
 
-  const toggleExpand = () => {
+  const toggleExpand = async () => {
+    if (!isExpanded) {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      await insertActivitySuggestion(user?.id as string, id, 'click_see_more');
+    }
     setIsExpanded(!isExpanded);
   };
 
@@ -48,7 +55,7 @@ const ItemList = ({
 
   return (
     <div
-      id={id}
+      id={`${id}`}
       className={cn(
         "px-4 flex flex-col gap-6 items-center",
         index !== 0 && "border-t-[1px] border-gray-800/30",
