@@ -87,7 +87,7 @@ const handleRecommendation = async (
       return 0;
     }));
 
-    console.time("checkpoint 4");
+    console.timeEnd("checkpoint 4");
     console.timeEnd("checkpoint 0");
     return recommendationId;
   } catch (error) {
