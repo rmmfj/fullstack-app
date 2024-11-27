@@ -166,8 +166,8 @@ function ConfirmButton({ isConfirmed, disabled }: { isConfirmed: boolean, disabl
 
 // Main Component
 export default function UploadPage() {
-  const searchParams = useSearchParams();
-  const currentStep = parseInt(searchParams.get('step') as string) || 1;
+  // const searchParams = useSearchParams();
+  // const currentStep = parseInt(searchParams.get('step') as string) || 1;
   const router = useRouter();
   const methods = useForm({
     resolver: zodResolver(schema),

@@ -53,14 +53,14 @@ const nextConfig = {
       bodySizeLimit: "4mb", // Set desired value here
     },
   },
-  webpack: (config, { isServer }) => {
-    if (process.env.NODE_ENV === "production") {
-      console.log = function (message) {
-        process.stdout.write(message + "\n");
-      };
-    }
-    return config;
-  },
+  // webpack: (config, { isServer }) => {
+  //   if (process.env.NODE_ENV === "production") {
+  //     console.log = function (message) {
+  //       process.stdout.write(message + "\n");
+  //     };
+  //   }
+  //   return config;
+  // },
 };
 
 module.exports = nextConfig;
