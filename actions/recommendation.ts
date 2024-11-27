@@ -64,7 +64,6 @@ const getRecommendationRecordById = async (
     
     console.time("checkpoint suggestions");
     for (const s of suggestions) {
-      console.time("checkpoint 7");
       const styleName = s.style_name as string;
       const description = s.description as string;
       const results = (await getResults(s.id)) as ResultTable[];
@@ -73,9 +72,7 @@ const getRecommendationRecordById = async (
         return null;
       }
 
-      console.timeEnd("checkpoint 7");
       
-      console.time("checkpoint 8");
       const item_ids = results.map((r) => r.item_id) as string[];
 
       const series_ids = (await getSeriesIdsByItemIds(item_ids)) as string[];
@@ -83,9 +80,7 @@ const getRecommendationRecordById = async (
         handleDatabaseError("No series IDs found for the given items", "getRecommendationRecordById");
         return null;
       }
-      console.timeEnd("checkpoint 8");
 
-      console.time("checkpoint 9");
       const gender = recommendation_record.gender ?? "neutral";
       const clothingType = recommendation_record.clothingType ?? "top";
       const series = (await getSeriesForRecommendation(series_ids, item_ids, gender, clothingType, user_id)) as Series[];
@@ -93,7 +88,6 @@ const getRecommendationRecordById = async (
         handleDatabaseError("No series found for the given series IDs", "getRecommendationRecordById");
         return null;
       }
-      console.timeEnd("checkpoint 9");
 
       recommendation_record.styles![styleName] = {
         suggestion_id: s.id,
