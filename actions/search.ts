@@ -99,11 +99,11 @@ const handleSearch = async (
   labelString: string,
   gender: Gender,
   page: number,
+  user_id: string | null,
   priceLowerBound?: number,
   priceUpperBound?: number,
   providers?: string[],
   clothingType?: ClothingType,
-  user_id?: string,
 ): Promise<SearchResult | null> => {
   try {
     const searchResult: SearchResult | null = await semanticSearchForSearching({

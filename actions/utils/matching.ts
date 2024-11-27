@@ -246,7 +246,7 @@ const semanticSearchForSearching = async ({
   providers?: string[];
   clothingType?: ClothingType;
   page: number;
-  user_id?: string;
+  user_id: string | null;
 }): Promise<SearchResult | null> => {
   try {
     console.log({

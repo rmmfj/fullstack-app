@@ -49,7 +49,9 @@ const ItemList = ({
       const {
         data: { user: userResponse },
       } = await supabase.auth.getUser();
-      setUserId(userResponse?.id as string);
+      if (userResponse) {
+        setUserId(userResponse?.id as string);
+      }
     })();
   }, []);
 

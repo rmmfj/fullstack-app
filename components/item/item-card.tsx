@@ -294,12 +294,12 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
       <div className='pb-2 flex justify-between'>
         <p>NTD {series.items[0].price as number}</p>
         <div className='flex justify-end gap-1'>
-          <motion.button whileTap={{ scale: 0.9 }}>
-            <Heart onClick={toggleFavorite} className='text-rose-300 cursor-pointer' {...(isFavorite ? { fill: '#fca5a5' } : { })} />
+          <motion.button whileTap={{ scale: 0.9 }} disabled={userId === null}>
+            <Heart onClick={toggleFavorite} className={cn(userId !== null ? 'text-rose-300' : 'text-rose-300/30')} {...(isFavorite ? { fill: '#fca5a5' } : { })} />
           </motion.button>
           <MoreOptions item={series.items[0]}>
             <motion.button whileTap={{ scale: 0.9 }}>
-              <EllipsisVertical className='text-gray-500 cursor-pointer' />
+              <EllipsisVertical className='text-gray-500' />
             </motion.button>
           </MoreOptions>
         </div>

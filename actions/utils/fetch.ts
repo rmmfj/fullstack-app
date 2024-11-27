@@ -157,7 +157,7 @@ const getSeriesByIdsForSearching = async (
   series_ids: string[],
   originalItemIds: string[],
   gender: string,
-  user_id?: string
+  user_id: string | null
 ): Promise<Series[] | null> => {
   try {
     // console.time("getSeriesByIdsForSearching");
@@ -181,7 +181,7 @@ const getSeriesByIdsForSearching = async (
         continue;
       }
 
-      const isFavorite = user_id
+      const isFavorite = user_id !== null
         ? await prisma.favorite.findFirst({
             where: {
               user_id: user_id,

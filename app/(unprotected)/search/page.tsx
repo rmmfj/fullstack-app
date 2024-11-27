@@ -104,7 +104,9 @@ export default function SearchPage() {
       const {
         data: { user: userResponse },
       } = await supabase.auth.getUser();
-      setUserId(userResponse?.id as string);
+      if (userResponse) {
+        setUserId(userResponse?.id as string);
+      }
     })();
   }, []);
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function SearchPage() {
           data: { user: userResponse },
         } = await supabase.auth.getUser();
         setUserId(userResponse?.id as string);
-        const res = await handleSearch(searchParams.get('label_string') as string, searchParams.get('gender'), page, undefined, undefined, undefined, undefined, userResponse?.id);
+        const res = await handleSearch(searchParams.get('label_string') as string, searchParams.get('gender'), page, userResponse ? userResponse.id : null, undefined, undefined, undefined, undefined);
         setResults([...(res?.series as Series[])] as Series[]);
         setTotalPages(res?.totalPages as number);
         setPage(1);
@@ -153,7 +155,7 @@ export default function SearchPage() {
     setLoading(true);
     const label = await getLabelStringForTextSearch(gender, "gpt-4o-mini",searchInput);
     setLabelString(label);
-    const res = await handleSearch(label, gender, page, undefined, undefined, undefined, undefined, userId as string);
+    const res = await handleSearch(label, gender, page, userId, undefined, undefined, undefined, undefined);
     setResults([...(res?.series as Series[])] as Series[]);
     setTotalPages(res?.totalPages as number);
     setPage(1);
@@ -167,7 +169,7 @@ export default function SearchPage() {
     setPage(page);
     setLoading(true);
     console.log(labelString)
-    const res = await handleSearch(labelString, gender, page, undefined, undefined, undefined, undefined, userId as string);
+    const res = await handleSearch(labelString, gender, page, userId, undefined, undefined, undefined, undefined);
     console.log(res);
     setResults([...(res?.series as Series[])] as Series[]);
     setLoading(false);
