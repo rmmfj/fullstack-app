@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Gender, Series } from "@/type";
 import { SearchIcon, SlidersHorizontal } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { z } from "zod";
 
 
@@ -153,9 +153,9 @@ export default function SearchPage() {
   const onSubmit = async () => {
     if (!searchInput) return;
     setLoading(true);
-    const label = await getLabelStringForTextSearch(gender, "gpt-4o-mini",searchInput);
-    setLabelString(label);
-    const res = await handleSearch(label, gender, page, userId, undefined, undefined, undefined, undefined);
+    const label = await getLabelStringForTextSearch(gender, "gpt-4o-mini", searchInput);
+    setLabelString(label.labelString);
+    const res = await handleSearch(label.labelString, gender, page, userId, undefined, undefined, undefined, undefined);
     setResults([...(res?.series as Series[])] as Series[]);
     setTotalPages(res?.totalPages as number);
     setPage(1);
@@ -176,180 +176,182 @@ export default function SearchPage() {
   };
 
   return (
-    <div className='container mx-auto px-4 py-8'>
-      <div className='max-w-4xl mx-auto'>
-        <div className='flex w-full gap-2'>
-          <div className='relative mb-4 w-full'>
-            <Input
-              id='search-bar'
-              type='search'
-              placeholder='你今天想找什麼樣的服飾呢？'
-              className='w-full pl-10 pr-6'
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
+    <Suspense fallback={<div>loading...</div>}>
+      <div className='container mx-auto px-4 py-8'>
+        <div className='max-w-4xl mx-auto'>
+          <div className='flex w-full gap-2'>
+            <div className='relative mb-4 w-full'>
+              <Input
+                id='search-bar'
+                type='search'
+                placeholder='你今天想找什麼樣的服飾呢？'
+                className='w-full pl-10 pr-6'
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
 
-            <SearchIcon className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
-          </div>
-
-          <Button
-            id='prompt-constructor-button'
-            size='icon'
-            onClick={() => setIsExpanded(!isExpanded)}
-            className={cn('mb-2 text-gray-700 hover:bg-gray-200 p-1', isExpanded ? 'bg-gray-200' : 'bg-transparnet')}
-          >
-            <SlidersHorizontal className="w-5" />
-          </Button>
-          
-          <LoadingButton
-            className='bg-indigo-400 hover:bg-indigo-300'
-            onClick={onSubmit}
-            loading={loading}
-          >
-            {!loading && <SearchIcon />}
-          </LoadingButton>
-        </div>
-
-        {isExpanded && (
-          <div className="bg-gray-100 p-2 mb-4 rounded-md">
-            <div className="flex gap-2 items-center justify-begin">
-              <Select onValueChange={(value: Gender) => {
-                setGender(value);
-                console.log(value);
-              }}>
-                <SelectTrigger className="w-[100px] bg-white">
-                  <SelectValue id='gender-select' placeholder="性別" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="neutral">無限制</SelectItem>
-                  <SelectItem value="male">男性</SelectItem>
-                  <SelectItem value="female">女性</SelectItem>
-                </SelectContent>
-              </Select>
-              <Separator className="border-1 h-6 border-gray-800" orientation="vertical" />
-              <Select onValueChange={(value: string) => {
-                setSelectedColor(value);
-                setSearchInput(`${value} ${selectedVersion} ${selectedStyle} ${selectedType}`.trim());
-              }}>
-                <SelectTrigger className="w-[100px] bg-white">
-                  <SelectValue placeholder="顏色" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="黑色">黑色</SelectItem>
-                  <SelectItem value="白色">白色</SelectItem>
-                  <SelectItem value="灰色">灰色</SelectItem>
-                  <SelectItem value="紅色">紅色</SelectItem>
-                  <SelectItem value="橘色">橘色</SelectItem>
-                  <SelectItem value="黃色">黃色</SelectItem>
-                  <SelectItem value="綠色">綠色</SelectItem>
-                  <SelectItem value="藍色">藍色</SelectItem>
-                  <SelectItem value="紫色">紫色</SelectItem>
-                  <SelectItem value="粉色">粉色</SelectItem>
-                  <SelectItem value="棕色">棕色</SelectItem>
-                  {/* Add more colors as needed */}
-                </SelectContent>
-              </Select>
-
-              <Select onValueChange={(value: string) => {
-                setSelectedVersion(value);
-                setSearchInput(`${selectedColor} ${value} ${selectedStyle} ${selectedType}`.trim());
-              }}>
-                <SelectTrigger className="w-[100px] bg-white">
-                  <SelectValue placeholder="版型" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="短袖">短袖</SelectItem>
-                  <SelectItem value="長袖">長袖</SelectItem>
-                  <SelectItem value="短褲">短褲</SelectItem>
-                  <SelectItem value="長褲">長褲</SelectItem>
-                  <SelectItem value="短裙">短裙</SelectItem>
-                  <SelectItem value="長裙">長裙</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select onValueChange={(value: string) => {
-                setSelectedStyle(value);
-                setSearchInput(`${selectedColor} ${selectedVersion} ${value} ${selectedType}`.trim());
-              }}>
-                <SelectTrigger className="w-[100px] bg-white">
-                  <SelectValue placeholder="款式" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="T恤">T恤</SelectItem>
-                  <SelectItem value="帽T">帽T</SelectItem>
-                  <SelectItem value="襯衫">襯衫</SelectItem>
-                  <SelectItem value="針織衫">針織衫</SelectItem>
-                  <SelectItem value="毛衣">毛衣</SelectItem>
-                  <SelectItem value="牛仔">牛仔</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select onValueChange={(value: string) => {
-                setSelectedType(value);
-                setSearchInput(`${selectedColor} ${selectedVersion} ${selectedStyle} ${value}`.trim());
-              }}>
-                <SelectTrigger className="w-[100px] bg-white">
-                  <SelectValue placeholder="風格" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="極簡">極簡</SelectItem>
-                  <SelectItem value="街頭">街頭</SelectItem>
-                  <SelectItem value="復古">復古</SelectItem>
-                  <SelectItem value="工裝">工裝</SelectItem>
-                  <SelectItem value="優雅">優雅</SelectItem>
-                  <SelectItem value="日系">日系</SelectItem>
-                  <SelectItem value="韓系">韓系</SelectItem>
-                  <SelectItem value="美式">美式</SelectItem>
-                  <SelectItem value="法式">法式</SelectItem>
-                </SelectContent>
-              </Select>
+              <SearchIcon className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
             </div>
-          </div>
-        )}
 
-        <div id='prompt-suggestions' className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
-          {promptSuggestions.map((suggestion, index) => (
-            <Card
-              key={index}
-              className='bg-indigo-200/50 cursor-pointer hover:bg-indigo-200/20 transition-colors shadow-[2px_2px_0px_0px_rgba(99,102,241,0.7)] border-2 border-indigo-500/70'
-              onClick={() => handleSuggestionClick(suggestion)}
+            <Button
+              id='prompt-constructor-button'
+              size='icon'
+              onClick={() => setIsExpanded(!isExpanded)}
+              className={cn('mb-2 text-gray-700 hover:bg-gray-200 p-1', isExpanded ? 'bg-gray-200' : 'bg-transparnet')}
             >
-              <CardContent className='p-4 h-full flex items-center justify-center text-center'>
-                <p className='text-sm font-semibold'>「{suggestion}」</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        {
-          results.length === 0 &&
-            <div className="w-full flex items-end justify-end my-4">
-              <TourButton tourName='search' />
+              <SlidersHorizontal className="w-5" />
+            </Button>
+            
+            <LoadingButton
+              className='bg-indigo-400 hover:bg-indigo-300'
+              onClick={onSubmit}
+              loading={loading}
+            >
+              {!loading && <SearchIcon />}
+            </LoadingButton>
+          </div>
+
+          {isExpanded && (
+            <div className="bg-gray-100 p-2 mb-4 rounded-md">
+              <div className="flex gap-2 items-center justify-begin">
+                <Select onValueChange={(value: Gender) => {
+                  setGender(value);
+                  console.log(value);
+                }}>
+                  <SelectTrigger className="w-[100px] bg-white">
+                    <SelectValue id='gender-select' placeholder="性別" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="neutral">無限制</SelectItem>
+                    <SelectItem value="male">男性</SelectItem>
+                    <SelectItem value="female">女性</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Separator className="border-1 h-6 border-gray-800" orientation="vertical" />
+                <Select onValueChange={(value: string) => {
+                  setSelectedColor(value);
+                  setSearchInput(`${value} ${selectedVersion} ${selectedStyle} ${selectedType}`.trim());
+                }}>
+                  <SelectTrigger className="w-[100px] bg-white">
+                    <SelectValue placeholder="顏色" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="黑色">黑色</SelectItem>
+                    <SelectItem value="白色">白色</SelectItem>
+                    <SelectItem value="灰色">灰色</SelectItem>
+                    <SelectItem value="紅色">紅色</SelectItem>
+                    <SelectItem value="橘色">橘色</SelectItem>
+                    <SelectItem value="黃色">黃色</SelectItem>
+                    <SelectItem value="綠色">綠色</SelectItem>
+                    <SelectItem value="藍色">藍色</SelectItem>
+                    <SelectItem value="紫色">紫色</SelectItem>
+                    <SelectItem value="粉色">粉色</SelectItem>
+                    <SelectItem value="棕色">棕色</SelectItem>
+                    {/* Add more colors as needed */}
+                  </SelectContent>
+                </Select>
+
+                <Select onValueChange={(value: string) => {
+                  setSelectedVersion(value);
+                  setSearchInput(`${selectedColor} ${value} ${selectedStyle} ${selectedType}`.trim());
+                }}>
+                  <SelectTrigger className="w-[100px] bg-white">
+                    <SelectValue placeholder="版型" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="短袖">短袖</SelectItem>
+                    <SelectItem value="長袖">長袖</SelectItem>
+                    <SelectItem value="短褲">短褲</SelectItem>
+                    <SelectItem value="長褲">長褲</SelectItem>
+                    <SelectItem value="短裙">短裙</SelectItem>
+                    <SelectItem value="長裙">長裙</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select onValueChange={(value: string) => {
+                  setSelectedStyle(value);
+                  setSearchInput(`${selectedColor} ${selectedVersion} ${value} ${selectedType}`.trim());
+                }}>
+                  <SelectTrigger className="w-[100px] bg-white">
+                    <SelectValue placeholder="款式" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="T恤">T恤</SelectItem>
+                    <SelectItem value="帽T">帽T</SelectItem>
+                    <SelectItem value="襯衫">襯衫</SelectItem>
+                    <SelectItem value="針織衫">針織衫</SelectItem>
+                    <SelectItem value="毛衣">毛衣</SelectItem>
+                    <SelectItem value="牛仔">牛仔</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select onValueChange={(value: string) => {
+                  setSelectedType(value);
+                  setSearchInput(`${selectedColor} ${selectedVersion} ${selectedStyle} ${value}`.trim());
+                }}>
+                  <SelectTrigger className="w-[100px] bg-white">
+                    <SelectValue placeholder="風格" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="極簡">極簡</SelectItem>
+                    <SelectItem value="街頭">街頭</SelectItem>
+                    <SelectItem value="復古">復古</SelectItem>
+                    <SelectItem value="工裝">工裝</SelectItem>
+                    <SelectItem value="優雅">優雅</SelectItem>
+                    <SelectItem value="日系">日系</SelectItem>
+                    <SelectItem value="韓系">韓系</SelectItem>
+                    <SelectItem value="美式">美式</SelectItem>
+                    <SelectItem value="法式">法式</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+          )}
+
+          <div id='prompt-suggestions' className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
+            {promptSuggestions.map((suggestion, index) => (
+              <Card
+                key={index}
+                className='bg-indigo-200/50 cursor-pointer hover:bg-indigo-200/20 transition-colors shadow-[2px_2px_0px_0px_rgba(99,102,241,0.7)] border-2 border-indigo-500/70'
+                onClick={() => handleSuggestionClick(suggestion)}
+              >
+                <CardContent className='p-4 h-full flex items-center justify-center text-center'>
+                  <p className='text-sm font-semibold'>「{suggestion}」</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          {
+            results.length === 0 &&
+              <div className="w-full flex items-end justify-end my-4">
+                <TourButton tourName='search' />
+              </div>
+          }
+        </div>
+        {loading ? (
+          <ItemListSkeleton index={0} />
+        ) : (
+          <ItemList
+            title=''
+            description={query}
+            series={results}
+            id={0}
+            index={0}
+            expandOnMount={true}
+            expandable={false}
+          />
+        )}
+        {
+          results.length > 0 &&
+          <div className="mt-8 w-full flex items-center justify-center">
+            <PaginationBar
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={handlePageNavigation}
+            />
+          </div>
         }
       </div>
-      {loading ? (
-        <ItemListSkeleton index={0} />
-      ) : (
-        <ItemList
-          title=''
-          description={query}
-          series={results}
-          id={0}
-          index={0}
-          expandOnMount={true}
-          expandable={false}
-        />
-      )}
-      {
-        results.length > 0 &&
-        <div className="mt-8 w-full flex items-center justify-center">
-          <PaginationBar
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={handlePageNavigation}
-          />
-        </div>
-      }
-    </div>
+    </Suspense>
   );
 }

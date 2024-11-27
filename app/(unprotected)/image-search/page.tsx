@@ -189,6 +189,9 @@ export default function UploadPage() {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!image) {
+      router.push('/image-search');
+    }
     (async () => {
       const supabase = createClient();
       const {
@@ -200,20 +203,11 @@ export default function UploadPage() {
     })();
   }, []);
 
-  useEffect(() => {
-    if (!image) {
-      router.push('/image-search');
-    }
-  }, []);
-
-
   const onSubmit = async (data: any) => {
     setLoading(true);
-    console.log(">> submit");
     setIsConfirmed(true);
     const reader = new FileReader();
     reader.onloadend = async () => {
-      const supabase = createClient();
       if (typeof reader.result === "string") {
         const base64 = reader.result;
         const filename = data.uploadedImage[0].name;
@@ -221,13 +215,18 @@ export default function UploadPage() {
           const imageUrl = await storeImageToStorage(base64, filename);
           setImage(imageUrl);
           setGender(data.gender);
-          const label_string = await getLabelStringForImageSearch(gender, "gpt-4o-mini", imageUrl);
-          setLabelString(label_string);
+          const labelString = await getLabelStringForImageSearch(gender, "gpt-4o-mini", imageUrl);
+          setLabelString(labelString.labelString);
+          console.log(labelString);
           const res = await handleSearch(
-            label_string,
+            labelString.labelString,
             data.gender,
             1,
-            userId
+            userId,
+            undefined,
+            undefined,
+            undefined,
+            labelString.clothing_type
           );
           setIsConfirmed(false);
           setResults([...(res?.series ?? [])] as Series[]);
