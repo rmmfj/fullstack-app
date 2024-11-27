@@ -332,7 +332,7 @@ export default function SearchPage() {
           title=''
           description={query}
           series={results}
-          id={""}
+          id={0}
           index={0}
           expandOnMount={true}
           expandable={false}
