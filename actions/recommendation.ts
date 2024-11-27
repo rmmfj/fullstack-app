@@ -62,8 +62,9 @@ const getRecommendationRecordById = async (
     }
     console.timeEnd("checkpoint 6");
     
-    console.time("checkpoint 7");
+    console.time("checkpoint suggestions");
     for (const s of suggestions) {
+      console.time("checkpoint 7");
       const styleName = s.style_name as string;
       const description = s.description as string;
       const results = (await getResults(s.id)) as ResultTable[];
@@ -93,13 +94,14 @@ const getRecommendationRecordById = async (
         return null;
       }
       console.timeEnd("checkpoint 9");
-      
+
       recommendation_record.styles![styleName] = {
         suggestion_id: s.id,
         series,
         description
       };
     }
+    console.timeEnd("checkpoint suggestions");
     console.timeEnd("getRecommendationRecordById");
     return recommendation_record as Recommendation;
   } catch (error) {
