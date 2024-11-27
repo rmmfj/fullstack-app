@@ -24,6 +24,8 @@ const getRecommendationRecordById = async (
   user_id: string,
 ): Promise<Recommendation | null> => {
   try {
+    console.time("getRecommendationRecordById");
+    console.time("checkpoint 5");
     const recommendation = await getRecommendationById(recommendation_id) as RecommendationTable;
     if (!recommendation || recommendation.user_id !== user_id) {
       return null;
@@ -40,6 +42,9 @@ const getRecommendationRecordById = async (
       return null;
     }
 
+    console.timeEnd("checkpoint 5");
+
+    console.time("checkpoint 6");
     const recommendation_record: Partial<Recommendation> = {
       clothingType: param.clothing_type,
       gender: param.gender,
@@ -55,7 +60,9 @@ const getRecommendationRecordById = async (
       handleDatabaseError("No suggestions found for given recommendation_id", "getRecommendationRecordById");
       return null;
     }
-
+    console.timeEnd("checkpoint 6");
+    
+    console.time("checkpoint 7");
     for (const s of suggestions) {
       const styleName = s.style_name as string;
       const description = s.description as string;
@@ -65,6 +72,9 @@ const getRecommendationRecordById = async (
         return null;
       }
 
+      console.timeEnd("checkpoint 7");
+      
+      console.time("checkpoint 8");
       const item_ids = results.map((r) => r.item_id) as string[];
 
       const series_ids = (await getSeriesIdsByItemIds(item_ids)) as string[];
@@ -72,7 +82,9 @@ const getRecommendationRecordById = async (
         handleDatabaseError("No series IDs found for the given items", "getRecommendationRecordById");
         return null;
       }
+      console.timeEnd("checkpoint 8");
 
+      console.time("checkpoint 9");
       const gender = recommendation_record.gender ?? "neutral";
       const clothingType = recommendation_record.clothingType ?? "top";
       const series = (await getSeriesForRecommendation(series_ids, item_ids, gender, clothingType, user_id)) as Series[];
@@ -80,13 +92,15 @@ const getRecommendationRecordById = async (
         handleDatabaseError("No series found for the given series IDs", "getRecommendationRecordById");
         return null;
       }
-
+      console.timeEnd("checkpoint 9");
+      
       recommendation_record.styles![styleName] = {
         suggestion_id: s.id,
         series,
         description
       };
     }
+    console.timeEnd("getRecommendationRecordById");
     return recommendation_record as Recommendation;
   } catch (error) {
     handleDatabaseError(error, "getRecommendationRecordById");
