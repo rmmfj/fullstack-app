@@ -54,12 +54,14 @@ const nextConfig = {
     },
   },
   webpack: (config, { isServer }) => {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.LOGGING_ENABLED === true) {
       console.log = function (message) {
         process.stdout.write(message + "\n");
       };
+    } else {
+      console.log = function (message) { };
     }
-    return config;
+      return config;
   },
 };
 
