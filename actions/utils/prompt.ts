@@ -90,10 +90,10 @@ const constructPromptForTextSearch = ({
           "設計特點": "[描述]", 
           "材質": "[材質]", 
           "細節": "[描述]", 
-          "領子": "[描述]", //選填
-          "袖子": "[描述]", //選填
-          "褲管": "[描述]", //選填
-          "裙擺": "[描述]" //選填
+          "領子": "[描述]", // 選填
+          "袖子": "[描述]", // 選填
+          "褲管": "[描述]", // 選填
+          "裙擺": "[描述]" // 選填
         }
       }
     ]
@@ -103,5 +103,5 @@ const constructPromptForTextSearch = ({
 export {
   constructPromptForImageSearch,
   constructPromptForRecommendation,
-  constructPromptForTextSearch,
+  constructPromptForTextSearch
 };
