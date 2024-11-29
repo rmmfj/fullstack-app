@@ -54,6 +54,7 @@ const nextConfig = {
     },
   },
   webpack: (config, { isServer }) => {
+    console.log(`LOGGING_ENABLED: ${process.env.LOGGING_ENABLED}`)
     if (process.env.LOGGING_ENABLED === true) {
       console.log = function (message) {
         process.stdout.write(message + "\n");
