@@ -54,7 +54,10 @@ const handler = async (): Promise<void> => {
         id: true,
         label_string: true,
       },
+      take: 500,
     });
+
+    console.log("meow")
 
     if (items.length > 0) {
       const updates = items.map(async (item) => {
@@ -86,6 +89,7 @@ const handler = async (): Promise<void> => {
     console.error("Error generating embeddings:", error);
   }
 };
+
 
 const calculateDistance = (
   embedding1: number[] | string,

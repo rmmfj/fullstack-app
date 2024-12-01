@@ -13,7 +13,7 @@ const ImageSearchSection = () => {
         讓您輕鬆找到滿意的結果。右側的小視窗讓您即刻試用並體驗這項功能效的果！`
       }
       buttonText="探索相似款式！"
-      buttonLink="/search"
+      buttonLink="/image-search"
       reverse={false}
       darkerBackground={false}
     >
