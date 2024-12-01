@@ -60,62 +60,6 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'oaidalleapiprodscus.blob.core.windows.net',
-      },
-      {
-        protocol: 'https',
-        hostname: 'dmbkhireuarjpvecjmds.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'jmgowbnhsejplwjfhpnv.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'media.discordapp.net',
-      },
-      {
-        protocol: 'https',
-        hostname: 'eapzlwxcyrinipmcdoir.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'image.uniqlo.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.uniqlo.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 's3.hicloud.net.tw',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.50-shop.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'lp2.hm.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.gu-global.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.lativ.com.tw',
-      },
-      {
-        protocol: 'https',
-        hostname: 's.lativ.com.tw',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.meierq.com',
-      },
-      {
-        protocol: 'https',
         hostname: 'pics.meierq.com',
       },
       {
