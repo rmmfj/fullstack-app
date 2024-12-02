@@ -25,7 +25,7 @@ const getRecommendationRecordById = async (
 ): Promise<Recommendation | null> => {
   try {
     console.time("getRecommendationRecordById");
-    console.time("checkpoint 5");
+    console.time("get recommendation");
     const recommendation = await getRecommendationById(recommendation_id) as RecommendationTable;
     if (!recommendation || recommendation.user_id && (recommendation.user_id !== user_id)) {
       return null;
@@ -42,9 +42,9 @@ const getRecommendationRecordById = async (
       return null;
     }
 
-    console.timeEnd("checkpoint 5");
+    console.timeEnd("get recommendation");
 
-    console.time("checkpoint 6");
+    console.time("get suggestions");
     const recommendation_record: Partial<Recommendation> = {
       clothingType: param.clothing_type,
       gender: param.gender,
@@ -60,9 +60,9 @@ const getRecommendationRecordById = async (
       handleDatabaseError("No suggestions found for given recommendation_id", "getRecommendationRecordById");
       return null;
     }
-    console.timeEnd("checkpoint 6");
+    console.timeEnd("get suggestions");
     
-    console.time("checkpoint suggestions");
+    console.time("get recommendation records");
     for (const s of suggestions) {
       const styleName = s.style_name as string;
       const description = s.description as string;
@@ -95,7 +95,7 @@ const getRecommendationRecordById = async (
         description
       };
     }
-    console.timeEnd("checkpoint suggestions");
+    console.timeEnd("get recommendation records");
     console.timeEnd("getRecommendationRecordById");
     return recommendation_record as Recommendation;
   } catch (error) {

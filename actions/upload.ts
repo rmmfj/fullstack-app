@@ -31,15 +31,13 @@ const handleRecommendation = async (
   imageUrl: string
 ): Promise<string | null> => {
   try {
-    console.time("checkpoint 0");
-    console.time("checkpoint 1");
+    console.time("flag upload");
+    console.time("flag 1");
     let recommendations: string | null = null;
     let cleanedRecommendations: ValidatedRecommendation[] = [];
     const maxRetries = 5;
     let attempts = 0;
-    console.timeEnd("checkpoint 1");
-
-    console.time("checkpoint 2");
+  
     while (recommendations?.length === 0 || cleanedRecommendations.length === 0) {
       if (attempts >= maxRetries) {
         console.error("Max retries reached for handling recommendation.");
@@ -47,26 +45,27 @@ const handleRecommendation = async (
       }
       console.log(`handleRecommendation while loop at iteration ${attempts}`);
       const prompt = constructPromptForRecommendation({ clothingType, gender, numMaxSuggestion });
-      console.log('flag1');
+      // console.log('flag1');
       recommendations = await sendImgURLAndPromptToGPT({ model, prompt, imageUrl });
-      console.log('flag2');
+      // console.log('flag2');
       
       if (!recommendations) continue;
       
       cleanedRecommendations = validateLabelString(recommendations, clothingType);
       attempts++;
     }
-    console.log('flag3');
+    console.timeEnd("flag 1");
+    // console.log('flag3');
     const uploadId: number = await insertUpload(imageUrl, userId);
-    console.log('flag4');
+    // console.log('flag4');
     const paramId: number = await insertParam(gender, clothingType, model);
-    console.log('flag5');
+    // console.log('flag5');
     const recommendationId: string = await insertRecommendation({
       paramId,
       uploadId,
       userId,
     });
-    console.log('flag6');
+    // console.log('flag6');
     
     await Promise.all(cleanedRecommendations.map(async (rec) => {
       const suggestionId = await insertSuggestion({
@@ -86,7 +85,8 @@ const handleRecommendation = async (
       await insertResults(results as UnstoredResult[]);
       return 0;
     }));
-    console.log('flag7');
+    console.timeEnd("flag upload");
+    // console.log('flag7');
     
     return recommendationId;
   } catch (error) {
