@@ -30,12 +30,11 @@ const storeImageToStorage = async (base64: string, filename: string) => {
     formData.append("file", blob, filename);
     const IMAGE_SERVER_ACCESS_SECRET = process.env.IMAGE_SERVER_ACCESS_SECRET;
     console.log(formData);
-    const response = await fetch("https://clothing.rfjmm.com/image/upload", {
+    const response = await fetch("http://image-server:5000/upload", {
       method: "POST",
       body: formData,
       headers: {
         Authorization: `Bearer ${IMAGE_SERVER_ACCESS_SECRET}`,
-        Origin: "https://clothing.rfjmm.com",
       },
     });
     console.log("reponse: ", response);
