@@ -1,102 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { Facebook, Instagram } from "lucide-react";
-import { usePathname } from "next/navigation";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog"; // 假設你已經安裝 shadcn 並有 Dialog 組件
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-const Footer = () => {
-  const pathname = usePathname();
-
-  // 判斷路徑是否為首頁，非首頁不顯示 Footer
-  if (pathname !== "/") return <></>;
+const PrivacyPolicy = () => {
+  const router = useRouter();
 
   return (
-    <footer className="bg-indigo-400 flex flex-col w-full border-t border-t-foreground/10 p-8 justify-center text-center text-xs">
-      {/* 社群連結 */}
-      <div className="flex justify-center space-x-4 mb-4">
-        <a href="#" className="text-white hover:text-gray-400">
-          <Instagram />
-        </a>
-        <a href="#" className="text-white hover:text-gray-400">
-          <Facebook />
-        </a>
-      </div>
+    <div className="p-6 max-w-3xl mx-auto">
+      {/* 返回按鈕 */}
+      <button
+        className="text-indigo-500 hover:underline mb-4"
+        onClick={() => router.push("/")}
+      >
+        返回
+      </button>
 
-      
-
-      {/* 服務條款和隱私權政策按鈕 */}
-      <div className="flex justify-center space-x-6 text-sm mb-4">
-        <Dialog>
-          <DialogTrigger asChild>
-            <button className="text-white hover:underline">服務條款</button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>服務條款</DialogTitle>
-              <DialogDescription>
-                <p>
-                  <strong>服務條款：一鍵穿新</strong>
-                </p>
-                <p>1. 資料收集</p>
-                <p>我們僅收集必要的資訊，包括姓名、頭像及電子郵件地址。</p>
-                <p>2. 資料用途</p>
-                <p>
-                  資料將用於顯示您的身分、提供個性化用戶體驗等功能。
-                </p>
-                <p>3. 資料共享與外洩</p>
-                <p>我們承諾不會將您的資料外洩或分享給任何第三方。</p>
-                <p>4. 用戶權利</p>
-                <p>您有權隨時查詢、更新或要求刪除您的個人資料。如需協助，請透過聯絡頁面與我們聯繫。</p>
-                <p>5. 資料保護</p>
-                <p>我們採用先進的安全技術來保護您的資料，防止未經授權的訪問或使用。</p>
-                <p>6. 政策更新</p>
-                <p>如有重大更改，我們將通過電子郵件或網站公告通知您。</p>
-
-                <p>更多資訊，請參考《隱私權政策》。</p>
-              </DialogDescription>
-              {/* <DialogClose asChild>
-                <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-                  X
-                </button>
-              </DialogClose> */}
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog>
-        <DialogTrigger asChild>
-          <Link href="/privacypolicy" className="text-white hover:underline">
-            隱私權政策
-          </Link>
-        </DialogTrigger>
-      {/* <DialogTrigger asChild>
-        <button className="text-white hover:underline">隱私權政策</button>
-      </DialogTrigger>
-      <DialogContent className="max-h-[80vh] overflow-y-auto bg-white p-6 rounded-lg shadow-lg">
-        <DialogHeader>
-          <DialogTitle>隱私權政策</DialogTitle>
-          <DialogDescription>
-            <p><strong>一鍵穿新隱私權政策</strong></p>
-            <p>最後更新日期：2024年11月28日</p>
-            <p>
-              本隱私權政策說明了我們在您使用本服務時，對您的個人資料的收集、使用及揭露的政策與程序，並告知您有關您的隱私權及法律如何保護您。
-            </p>
-            <p>
-              我們使用您的個人資料以提供並改善本服務。透過使用本服務，即表示您同意根據本隱私權政策收集和使用資訊。
-            </p>
-            <hr />
-            <h2 className="font-bold text-lg">解釋與定義</h2>
-            <h3 className="font-bold">解釋</h3>
+      {/* 隱私權政策內容 */}
+      <h1 className="text-2xl font-bold mb-4">隱私權政策</h1>
+      <p><strong>一鍵穿新隱私權政策</strong></p>
+      <p>最後更新日期：2024年11月28日</p>
+      <p>
+        本隱私權政策說明了我們在您使用本服務時，對您的個人資料的收集、使用及揭露的政策與程序，並告知您有關您的隱私權及法律如何保護您。
+      </p>
+      <p>
+        我們使用您的個人資料以提供並改善本服務。透過使用本服務，即表示您同意根據本隱私權政策收集和使用資訊。
+      </p>
+      <hr className="my-4" />
+      <h2 className="font-bold text-lg">解釋與定義</h2>
+      <h3 className="font-bold">解釋</h3>
             <p>
               首字母大寫的詞語在以下條件下具有定義的含義。無論這些詞語以單數或複數形式出現，其定義均相同。
             </p>
@@ -169,18 +100,8 @@ const Footer = () => {
                 mmrfj@ntu.im
               </a>
             </p>
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent> */}
-    </Dialog>
-      </div>
-
-      {/* 版權聲明 */}
-      <div className="text-sm text-white">
-        © 2024 你會不會穿搭啊｜All rights reserved.
-      </div>
-    </footer>
+    </div>
   );
 };
 
-export default Footer;
+export default PrivacyPolicy;
