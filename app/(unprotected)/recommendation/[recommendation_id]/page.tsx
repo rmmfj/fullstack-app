@@ -28,6 +28,7 @@ const RecommendationPage = async ({
     recommendation_id,
     user !== null ? user.id : null
   )) as Recommendation;
+  console.log("the recommendation id is ", recommendation.imageUrl);
   if (!recommendation)
     return (
       <div className="w-full h-full flex flex-col gap-8 items-center justify-center">
