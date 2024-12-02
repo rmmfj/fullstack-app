@@ -30,7 +30,7 @@ const getLabelString = async (
   while (rawLabelString?.length === 0 || cleanedLabels.length === 0) {
     if (attempts >= MAX_RETRIES) {
       console.error("Max retries reached.");
-      return { labelString: "", clothing_type: undefined };
+      return { labelString: "", clothing_type: undefined, gender: undefined };
     }
 
     const prompt = promptGenerator({ gender, imageUrlOrQuery });

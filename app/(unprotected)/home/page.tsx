@@ -8,21 +8,21 @@ const FEATURES = [
   {
     title: '穿搭推薦',
     icon: <Shirt className="w-4 h-4" />,
-    desrciption: '沒用的敘述，沒用的敘述沒用的敘述。沒用的敘述沒用的敘述，沒用的敘述！',
+    desrciption: '上傳服飾照片，找到最適服飾單品。輕鬆解決每天出門前的穿衣煩惱～',
     href: '/upload',
     buttonText: '感受專屬的穿搭推薦',
   },
   {
     title: '文字搜尋',
     icon: <TextSearch className="w-4 h-4" />,
-    desrciption: '沒用的敘述，沒用的敘述沒用的敘述。沒用的敘述沒用的敘述，沒用的敘述！',
+    desrciption: '輸入需求，快速篩選最符合的商品。不用花時間檢索，系統懂你在說啥！',
     href: '/search',
     buttonText: '探索相似款式',
   },
   {
     title: '以服搜服',
     icon: <ScanSearch className="w-4 h-4" />,
-    desrciption: '沒用的敘述，沒用的敘述沒用的敘述。沒用的敘述沒用的敘述，沒用的敘述！',
+    desrciption: '上傳服飾照片，搜尋相似的商品。看到喜歡的穿搭，隨時都能找到購買方式。',
     href: '/image-search',
     buttonText: '快速找到理想的單品',
   }

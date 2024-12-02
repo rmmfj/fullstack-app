@@ -1,9 +1,7 @@
 "use client";
 
 import {
-  getProfileByUserId,
-  signOut,
-  updateUserProfile,
+  getProfileByUserId
 } from "@/actions/utils/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,9 +16,10 @@ import {
 import { ProfileTable } from "@/type";
 import { createClient } from "@/utils/supabase/client";
 import { User as UserType } from "@supabase/supabase-js";
-import { Camera, LogOut, Settings, Tag } from "lucide-react";
+import { Camera, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
 import EditUsernameDialog from "./edit-username-diaglog";
+import LogoutButton from "./logout-button";
 
 export default function AvatarMenu() {
   const [user, setUser] = useState<UserType | null>(null);
@@ -40,10 +39,6 @@ export default function AvatarMenu() {
       setProfile(profile);
     })();
   }, []);
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
 
   const handleEditUsernameMenuItem = () => {
     setIsEditUsernameDialogOpen(true);
@@ -74,7 +69,7 @@ export default function AvatarMenu() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-fit' align='end' forceMount>
-          <DropdownMenuLabel className='font-normal'>
+          <DropdownMenuLabel className='font-normal flex gap-4'>
             <div className='flex flex-col space-y-1'>
               <p className='text-sm font-medium leading-none'>
                 {profile?.username}
@@ -83,6 +78,7 @@ export default function AvatarMenu() {
                 {user?.email}
               </p>
             </div>
+            
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
 
@@ -100,15 +96,10 @@ export default function AvatarMenu() {
             <Camera className='mr-2 h-4 w-4' />
             <span>更改使用者頭像</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className='cursor-pointer'>
-            <Settings className='mr-2 h-4 w-4' />
-            <span>查看更多設定</span>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className='cursor-pointer' onClick={handleSignOut}>
-            <LogOut className='mr-2 h-4 w-4' />
-            <span>登出</span>
-          </DropdownMenuItem>
+          <div className="flex w-full justify-end">
+            <LogoutButton />
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
       <EditUsernameDialog

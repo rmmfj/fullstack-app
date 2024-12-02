@@ -11,7 +11,7 @@ const HeroSection = () => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push("/upload"); // Navigate to the /upload route
+    router.push("/login"); // Navigate to the /upload route
   };
   return (
     <section className='md:h-[75vh] h-fit py-32 text-gray-800 relative flex md:flex-row flex-col-reverse  items-center justify-center bg-cover bg-center md:gap-24 gap-8 px-10'>

@@ -97,7 +97,7 @@ export function ItemInfoDialog({
           </DialogDescription>
         </DialogHeader> 
         <div className="flex flex-col gap-6 items-center justify-center">
-          <div className='relative w-40 h-40 md:w-64 md:h-64'>
+          <div className='relative w-36 h-36 md:w-64 md:h-64'>
             <Image
               src={item.image_url as string}
               className='object-cover'
@@ -207,7 +207,7 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
   });
   
   return (
-    <Card className='w-40 md:w-64 rounded-none flex flex-col justify-between h-fit gap-1 shadow-none border-0'>
+    <Card className='w-36 md:w-64 rounded-none flex flex-col justify-between h-fit gap-1 shadow-none border-0'>
       <div className='relative inline-block w-full h-full'>
         {
           series.items.length > 0 &&
@@ -233,7 +233,7 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
                 <CarouselMainContainer className='h-full w-full'>
                   {series.items.map((item, index) => (
                     <SliderMainItem key={item.id} className='bg-transparent'>
-                      <div className='relative w-full h-40 md:h-64'>
+                      <div className='relative w-full h-36 md:h-64'>
                         <Image
                           src={item.image_url as string}
                           className='object-cover'
@@ -247,7 +247,7 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
                   ))}
                 </CarouselMainContainer>
               </Link>
-              <div className='relative w-40 md:w-64 bottom-2 left-1/2 -translate-x-1/2'>
+              <div className='relative w-36 md:w-64 bottom-2 left-1/2 -translate-x-1/2'>
                 <CarouselThumbsContainer onClick={recordActivity('switch_color')} className='gap-x-1'>
                   {series.items.map((_, index) => (
                     <CarouselIndicator
@@ -260,7 +260,7 @@ const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }
             </div>
           </Carousel>
         ) : (
-          <div className='relative w-full h-40 md:h-64'>
+          <div className='relative w-full h-36 md:h-64'>
             <Link
               target="_blank"
               onClick={recordActivity('click_see_more')}

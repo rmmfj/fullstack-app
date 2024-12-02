@@ -1,11 +1,11 @@
 "use client";
 
 import { signOut } from "@/actions/utils/user";
-import { LogIn, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 
-export default function AuthButton() {
+export default function LogoutButton() {
   const router = useRouter();
 
   const onClick = async () => {
@@ -17,10 +17,10 @@ export default function AuthButton() {
     <Button
       variant='outline'
       onClick={onClick}
-      className='m-0 p-0 border-0 w-fit px-4 text-xs'
+      className='m-0 p-0 border-0 w-full px-4 text-xs rounded-none'
     >
-      <LogIn className='mr-2 h-3 w-3' />
-      登入／註冊
+      <LogOut className='mr-2 h-3 w-3' />
+      登出
     </Button>
   );
 }

@@ -45,27 +45,20 @@ const handleRecommendation = async (
       }
       console.log(`handleRecommendation while loop at iteration ${attempts}`);
       const prompt = constructPromptForRecommendation({ clothingType, gender, numMaxSuggestion });
-      // console.log('flag1');
       recommendations = await sendImgURLAndPromptToGPT({ model, prompt, imageUrl });
-      // console.log('flag2');
       
       if (!recommendations) continue;
       
       cleanedRecommendations = validateLabelString(recommendations, clothingType);
       attempts++;
     }
-    console.timeEnd("flag 1");
-    // console.log('flag3');
     const uploadId: number = await insertUpload(imageUrl, userId);
-    // console.log('flag4');
     const paramId: number = await insertParam(gender, clothingType, model);
-    // console.log('flag5');
     const recommendationId: string = await insertRecommendation({
       paramId,
       uploadId,
       userId,
     });
-    // console.log('flag6');
     
     await Promise.all(cleanedRecommendations.map(async (rec) => {
       const suggestionId = await insertSuggestion({
@@ -85,8 +78,6 @@ const handleRecommendation = async (
       await insertResults(results as UnstoredResult[]);
       return 0;
     }));
-    console.timeEnd("flag upload");
-    // console.log('flag7');
     
     return recommendationId;
   } catch (error) {

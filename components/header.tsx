@@ -10,6 +10,7 @@ import { Archive, House, Menu, ScanSearch, Shirt, TextSearch, WandSparkles } fro
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import AuthButton from "./auth-button";
 import AvatarMenu from "./avatar-menu";
 
 const LandingPageHeader = () => {
@@ -225,7 +226,7 @@ const Header = () => {
             </SheetContent>
           </Sheet>
         }
-        {user && !isMobile && <AvatarMenu />}
+        {!isMobile && (user ? <AvatarMenu /> : <AuthButton />)}
       </div>
     </header>
   );

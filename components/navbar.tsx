@@ -1,4 +1,4 @@
-import AuthButton from "./auth-button";
+import AuthButton from "./logout-button";
 
 const Navbar = () => {
   return (

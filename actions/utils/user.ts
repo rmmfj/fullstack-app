@@ -126,6 +126,7 @@ const getPreviewsByUserId = async (
 const signOut = async () => {
   const supabase = createClient();
   await supabase.auth.signOut();
+  revalidatePath('/login');
   return true;
 };
 

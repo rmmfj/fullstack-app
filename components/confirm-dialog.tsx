@@ -49,7 +49,7 @@ const ConfirmDialog = ({
         className='sm:w-[32rem] w-[88vw]'
       >
         <DialogHeader>
-          {title && <DialogTitle>{title}</DialogTitle>}
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         {text}
         <DialogFooter>
