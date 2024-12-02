@@ -13,4 +13,6 @@ services:
       - /app/.next
     env_file:
       - .env.production
+    networks:
+      - my_app_network
     restart: always
