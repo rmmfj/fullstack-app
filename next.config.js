@@ -4,6 +4,10 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "clothing.rfjmm.com",
+      },
+      {
+        protocol: "https",
         hostname: "oaidalleapiprodscus.blob.core.windows.net",
       },
       {
