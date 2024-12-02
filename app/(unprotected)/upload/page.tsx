@@ -218,8 +218,9 @@ export default function UploadPage() {
       const supabase = createClient();
       if (typeof reader.result === "string") {
         const base64 = reader.result;
+        const filename = data.uploadedImage.name;
         try {
-          const imageUrl = await storeImageToStorage(base64);
+          const imageUrl = await storeImageToStorage(base64, filename);
           const {
             data: { user },
           } = await supabase.auth.getUser();
