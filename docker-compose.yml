@@ -8,11 +8,14 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      # - .:/app  # Bind the local directory to the container
-      - /app/node_modules  # Prevent overwriting node_modules
+      - /app/node_modules
       - /app/.next
     env_file:
       - .env.production
     networks:
       - my_app_network
     restart: always
+
+networks:
+  my_app_network:
+    external: true  # Use the shared external network
