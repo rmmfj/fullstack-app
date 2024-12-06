@@ -1,8 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
+import { useToast } from './ui/use-toast';
 
 export default function GoogleLoginButton() {
+  const { toast } = useToast();
   const signInWithGoogle = async () => {
     const supabase = createClient();
     const res = await supabase.auth.signInWithOAuth({
@@ -11,7 +13,10 @@ export default function GoogleLoginButton() {
         redirectTo: location.origin + "/auth/callback?next=/upload",
       },
     });
-    console.log(res);
+    toast({
+      title: '🎉 歡迎加入大家庭',
+      description: '謝謝你選擇加入我們，現在就一起探索屬於你的穿搭靈感吧！✨👗👖',
+    })
   };
 
   return (

@@ -1,11 +1,12 @@
 "use client";
 
 import { signOut } from "@/actions/utils/user";
-import { LogIn, LogOut } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 
-export default function AuthButton() {
+export default function AuthButton({ isMobile }: { isMobile?: boolean }) {
   const router = useRouter();
 
   const onClick = async () => {
@@ -17,9 +18,9 @@ export default function AuthButton() {
     <Button
       variant='outline'
       onClick={onClick}
-      className='m-0 p-0 border-0 w-fit px-4 text-xs'
+      className={cn('m-0 p-0 border-0 w-fit px-4', isMobile ? 'text-md' : 'text-xs')}
     >
-      <LogIn className='mr-2 h-3 w-3' />
+      <LogIn className={cn(isMobile ? 'mr-3' : 'mr-2', isMobile ? 'h-4 w-4' : 'h-3 w-3')} />
       登入／註冊
     </Button>
   );

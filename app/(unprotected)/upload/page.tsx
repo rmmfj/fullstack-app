@@ -125,7 +125,7 @@ const Overview = ({
         <div className='flex'>
           <div className='flex flex-row w-full items-center gap-4'>
             <Badge className='bg-indigo-300 hover:bg-indigo-300'>性別</Badge>
-            <p>{formData.gender === "male" ? "男性 🙋‍♂️" : "女性 🙋‍♀️"}</p>
+            <p>{formData.gender === "male" ? "男性 🙋‍♂️" : (formData.gender === "female" ? "女性 🙋‍♀️" : "無限制")}</p>
           </div>
           <div className='flex flex-row w-full items-center gap-4'>
             <Badge className='bg-indigo-300 hover:bg-indigo-300'>類別</Badge>

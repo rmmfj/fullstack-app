@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import EditUsernameDialog from "./edit-username-diaglog";
 import LogoutButton from "./logout-button";
 
-export default function AvatarMenu() {
+export default function AvatarMenu({ isMobile } : { isMobile?: boolean }) {
   const [user, setUser] = useState<UserType | null>(null);
   const [profile, setProfile] = useState<ProfileTable | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -44,21 +44,49 @@ export default function AvatarMenu() {
     setIsEditUsernameDialogOpen(true);
   };
 
-  // const handleChangeProfilePicture = async () => {
-  //   console.log("Change profile picture clicked");
-  //   const supabase = createClient();
-  //   const {
-  //     data: { user },
-  //   } = await supabase.auth.getUser();
-  //   await updateUserProfile(location.origin, user?.id as string);
-  //   // Implement profile picture change logic here
-  // };
+  if (isMobile) {
+    return <div className="w-full flex flex-col gap-4 text-xl text-gray-800">
+      <div className="flex items-center gap-4">
+        <Avatar className='h-12 w-12'>
+          <AvatarImage
+            src={profile?.avatar_url as string}
+            alt={`${profile?.username}'s Avatar`}
+            />
+          <AvatarFallback>{profile?.username}</AvatarFallback>
+        </Avatar>
+        <p>
+          { profile?.username }
+        </p>
+      </div>
+      <div
+        className='flex items-center justify-center gap-4 cursor-pointer'
+        onClick={handleEditUsernameMenuItem}
+      >
+        <Tag className='mr-2 h-4 w-4' />
+        <span>更改使用者名稱</span>
+      </div>
+      <div
+        className='flex items-center justify-center gap-4 cursor-pointer'
+        // onClick={handleChangeProfilePicture}
+      >
+        <Camera className='mr-2 h-4 w-4' />
+        <span>更改使用者頭像</span>
+      </div>
+      <div className="flex w-full justify-end">
+        <LogoutButton isMobile={true} />
+      </div>
+      <EditUsernameDialog
+        open={isEditUsernameDialogOpen}
+        setOpen={setIsEditUsernameDialogOpen}
+      />
+    </div>;
+  }
 
   return (
     <>
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='relative h-10 w-10 rounded-full'>
+          <Button variant='ghost' className='self-end relative h-10 w-10 rounded-full'>
             <Avatar className='h-10 w-10'>
               <AvatarImage
                 src={profile?.avatar_url as string}
@@ -77,11 +105,9 @@ export default function AvatarMenu() {
               <p className='text-xs leading-none text-muted-foreground'>
                 {user?.email}
               </p>
-            </div>
-            
+            </div>      
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-
           <DropdownMenuItem
             className='cursor-pointer'
             onClick={handleEditUsernameMenuItem}

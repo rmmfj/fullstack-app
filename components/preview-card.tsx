@@ -10,9 +10,9 @@ import Link from "next/link";
 const PreviewCard = ({ preview }: { preview: RecommendationPreview }) => {
   
   return (
-    <Card className='w-40 md:w-64 rounded-none flex flex-col justify-between h-fit gap-1 shadow-none border-0'>
+    <Card className='w-36 md:w-64 rounded-none flex flex-col justify-between h-fit gap-1 shadow-none border-0'>
       <div className='relative inline-block w-full h-full'>
-        <div className='relative w-full h-40 md:h-64'>
+        <div className='relative w-full h-36 md:h-64'>
           <Link
             href={`/recommendation/${preview.id}`}
             onClick={async () => {

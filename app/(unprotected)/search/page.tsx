@@ -26,6 +26,9 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Checkbox } from "@radix-ui/react-checkbox";
+import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
+import { MultiSelect } from "@/components/multi-select";
 
 const schema = z.object({
   uploadedImage: (typeof window === "undefined"
@@ -94,9 +97,49 @@ export default function SearchPage() {
   const [selectedVersion, setSelectedVersion] = useState<string>(""); // 版型
   const [selectedStyle, setSelectedStyle] = useState<string>(""); // 風格
   const [selectedType, setSelectedType] = useState<string>(""); // 款式
+  const [priceLowerBound, setPriceLowerBound] = useState<number | null>(null);
+  const [priceUpperBound, setPriceUpperBound] = useState<number | null>(null);
+  const [provider, setProvider] = useState<string[] | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [page, setPage] = useState<number>(1);
   const [userId, setUserId] = useState<string | null>(null);
+
+  const priceOptions = [300, 500, 750, 1000, 2000, 5000];
+  const providerList = [
+    { value: "UNIQLO", label: "UNIQLO"},
+    { value: "FIFTY PERCENT", label: "FIFTY PERCENT"},
+    { value: "H&M", label: "H&M"},
+    { value: "GU", label: "GU"},
+    { value: "ZARA", label: "ZARA"},
+    { value: "lativ", label: "lativ"},
+    { value: "PAZZO", label: "PAZZO"},
+    { value: "Meier.Q", label: "Meier.Q"},
+  ];
+
+  const handleLowerBoundChange = (value: string) => {
+    const numValue = value === "null" ? null : Number(value);
+    setPriceLowerBound(numValue);
+    if (numValue !== null && priceUpperBound !== null && numValue >= priceUpperBound) {
+      setPriceUpperBound(null); // 清空不符合條件的最高價格
+    }
+  };
+
+  const handleUpperBoundChange = (value: string) => {
+    const numValue = value === "null" ? null : Number(value);
+    setPriceUpperBound(numValue);
+    if (numValue !== null && priceLowerBound !== null && numValue <= priceLowerBound) {
+      setPriceLowerBound(null); // 清空不符合條件的最低價格
+    }
+  };
+
+  const handleBrandChange = (brand: string) => {
+    setProvider((prev) => {
+      const current = prev ?? [];
+      return current.includes(brand)
+        ? current.filter((b) => b !== brand)
+        : [...current, brand];
+    });
+  };
 
   useEffect(() => {
     (async () => {
@@ -121,7 +164,7 @@ export default function SearchPage() {
           data: { user: userResponse },
         } = await supabase.auth.getUser();
         setUserId(userResponse?.id as string);
-        const res = await handleSearch(searchParams.get('label_string') as string, searchParams.get('gender'), page, userResponse ? userResponse.id : null, undefined, undefined, undefined, undefined);
+        const res = await handleSearch(searchParams.get('label_string') as string, searchParams.get('gender'), page, userResponse ? userResponse.id : null, priceLowerBound?priceLowerBound:undefined, priceUpperBound?priceUpperBound:undefined, provider?provider:undefined, undefined);
         setResults([...(res?.series as Series[])] as Series[]);
         setTotalPages(res?.totalPages as number);
         setPage(1);
@@ -155,7 +198,7 @@ export default function SearchPage() {
     setLoading(true);
     const label = await getLabelStringForTextSearch(gender, "gpt-4o-mini", searchInput);
     setLabelString(label.labelString);
-    const res = await handleSearch(label.labelString, gender, page, userId, undefined, undefined, undefined, undefined);
+    const res = await handleSearch(label.labelString, gender, page, userId, priceLowerBound?priceLowerBound:undefined, priceUpperBound?priceUpperBound:undefined, provider?provider:undefined, undefined);
     setResults([...(res?.series as Series[])] as Series[]);
     setTotalPages(res?.totalPages as number);
     setPage(1);
@@ -169,187 +212,263 @@ export default function SearchPage() {
     setPage(page);
     setLoading(true);
     console.log(labelString)
-    const res = await handleSearch(labelString, gender, page, userId, undefined, undefined, undefined, undefined);
+    const res = await handleSearch(labelString, gender, page, userId, priceLowerBound?priceLowerBound:undefined, priceUpperBound?priceUpperBound:undefined, provider?provider:undefined, undefined);
     console.log(res);
     setResults([...(res?.series as Series[])] as Series[]);
     setLoading(false);
   };
 
   return (
-      <div className='container mx-auto px-4 py-8'>
-        <div className='max-w-4xl mx-auto'>
-          <div className='flex w-full gap-2'>
-            <div className='relative mb-4 w-full'>
-              <Input
-                id='search-bar'
-                type='search'
-                placeholder='你今天想找什麼樣的服飾呢？'
-                className='w-full pl-10 pr-6'
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
+    <div className='container mx-auto px-4 py-8'>
+      <div className='max-w-4xl mx-auto'>
+        <div className='flex w-full gap-2'>
+          <div className='relative mb-4 w-full'>
+            <Input
+              id='search-bar'
+              type='search'
+              placeholder='你今天想找什麼樣的服飾呢？'
+              className='w-full pl-10 pr-6'
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
 
-              <SearchIcon className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
-            </div>
-
-            <Button
-              id='prompt-constructor-button'
-              size='icon'
-              onClick={() => setIsExpanded(!isExpanded)}
-              className={cn('mb-2 text-gray-700 hover:bg-gray-200 p-1', isExpanded ? 'bg-gray-200' : 'bg-transparnet')}
-            >
-              <SlidersHorizontal className="w-5" />
-            </Button>
-            
-            <LoadingButton
-              className='bg-indigo-400 hover:bg-indigo-300'
-              onClick={onSubmit}
-              loading={loading}
-            >
-              {!loading && <SearchIcon />}
-            </LoadingButton>
+            <SearchIcon className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
           </div>
 
-          {isExpanded && (
-            <div className="bg-gray-100 p-2 mb-4 rounded-md">
-              <div className="flex gap-2 items-center justify-begin">
-                <Select onValueChange={(value: Gender) => {
-                  setGender(value);
-                  console.log(value);
-                }}>
-                  <SelectTrigger className="w-[100px] bg-white">
-                    <SelectValue id='gender-select' placeholder="性別" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="neutral">無限制</SelectItem>
-                    <SelectItem value="male">男性</SelectItem>
-                    <SelectItem value="female">女性</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Separator className="border-1 h-6 border-gray-800" orientation="vertical" />
-                <Select onValueChange={(value: string) => {
-                  setSelectedColor(value);
-                  setSearchInput(`${value} ${selectedVersion} ${selectedStyle} ${selectedType}`.trim());
-                }}>
-                  <SelectTrigger className="w-[100px] bg-white">
-                    <SelectValue placeholder="顏色" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="黑色">黑色</SelectItem>
-                    <SelectItem value="白色">白色</SelectItem>
-                    <SelectItem value="灰色">灰色</SelectItem>
-                    <SelectItem value="紅色">紅色</SelectItem>
-                    <SelectItem value="橘色">橘色</SelectItem>
-                    <SelectItem value="黃色">黃色</SelectItem>
-                    <SelectItem value="綠色">綠色</SelectItem>
-                    <SelectItem value="藍色">藍色</SelectItem>
-                    <SelectItem value="紫色">紫色</SelectItem>
-                    <SelectItem value="粉色">粉色</SelectItem>
-                    <SelectItem value="棕色">棕色</SelectItem>
-                    {/* Add more colors as needed */}
-                  </SelectContent>
-                </Select>
-
-                <Select onValueChange={(value: string) => {
-                  setSelectedVersion(value);
-                  setSearchInput(`${selectedColor} ${value} ${selectedStyle} ${selectedType}`.trim());
-                }}>
-                  <SelectTrigger className="w-[100px] bg-white">
-                    <SelectValue placeholder="版型" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="短袖">短袖</SelectItem>
-                    <SelectItem value="長袖">長袖</SelectItem>
-                    <SelectItem value="短褲">短褲</SelectItem>
-                    <SelectItem value="長褲">長褲</SelectItem>
-                    <SelectItem value="短裙">短裙</SelectItem>
-                    <SelectItem value="長裙">長裙</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select onValueChange={(value: string) => {
-                  setSelectedStyle(value);
-                  setSearchInput(`${selectedColor} ${selectedVersion} ${value} ${selectedType}`.trim());
-                }}>
-                  <SelectTrigger className="w-[100px] bg-white">
-                    <SelectValue placeholder="款式" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="T恤">T恤</SelectItem>
-                    <SelectItem value="帽T">帽T</SelectItem>
-                    <SelectItem value="襯衫">襯衫</SelectItem>
-                    <SelectItem value="針織衫">針織衫</SelectItem>
-                    <SelectItem value="毛衣">毛衣</SelectItem>
-                    <SelectItem value="牛仔">牛仔</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select onValueChange={(value: string) => {
-                  setSelectedType(value);
-                  setSearchInput(`${selectedColor} ${selectedVersion} ${selectedStyle} ${value}`.trim());
-                }}>
-                  <SelectTrigger className="w-[100px] bg-white">
-                    <SelectValue placeholder="風格" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="極簡">極簡</SelectItem>
-                    <SelectItem value="街頭">街頭</SelectItem>
-                    <SelectItem value="復古">復古</SelectItem>
-                    <SelectItem value="工裝">工裝</SelectItem>
-                    <SelectItem value="優雅">優雅</SelectItem>
-                    <SelectItem value="日系">日系</SelectItem>
-                    <SelectItem value="韓系">韓系</SelectItem>
-                    <SelectItem value="美式">美式</SelectItem>
-                    <SelectItem value="法式">法式</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-
-          <div id='prompt-suggestions' className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
-            {promptSuggestions.map((suggestion, index) => (
-              <Card
-                key={index}
-                className='bg-indigo-200/50 cursor-pointer hover:bg-indigo-200/20 transition-colors shadow-[2px_2px_0px_0px_rgba(99,102,241,0.7)] border-2 border-indigo-500/70'
-                onClick={() => handleSuggestionClick(suggestion)}
-              >
-                <CardContent className='p-4 h-full flex items-center justify-center text-center'>
-                  <p className='text-sm font-semibold'>「{suggestion}」</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          {
-            results.length === 0 &&
-              <div className="w-full flex items-end justify-end my-4">
-                <TourButton tourName='search' />
-              </div>
-          }
+          <Button
+            id='prompt-constructor-button'
+            size='icon'
+            onClick={() => setIsExpanded(!isExpanded)}
+            className={cn('mb-2 text-gray-700 hover:bg-gray-200 p-1', isExpanded ? 'bg-gray-200' : 'bg-transparnet')}
+          >
+            <SlidersHorizontal className="w-5" />
+          </Button>
+          
+          <LoadingButton
+            className='bg-indigo-400 hover:bg-indigo-300'
+            onClick={onSubmit}
+            loading={loading}
+          >
+            {!loading && <SearchIcon />}
+          </LoadingButton>
         </div>
-        {loading ? (
-          <ItemListSkeleton index={0} />
-        ) : (
-          <ItemList
-            title=''
-            description={query}
-            series={results}
-            id={0}
-            index={0}
-            expandOnMount={true}
-            expandable={false}
-          />
-        )}
-        {
-          results.length > 0 &&
-          <div className="mt-8 w-full flex items-center justify-center">
-            <PaginationBar
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={handlePageNavigation}
+
+        <div className="bg-gray-100 p-2 mb-4 rounded-md">
+          <div className="flex gap-2 items-center justify-begin">
+            <Select onValueChange={(value: Gender) => {
+              setGender(value);
+              console.log(value);
+            }}>
+              <SelectTrigger className="w-[100px] bg-white">
+                <SelectValue id='gender-select' placeholder="性別" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="neutral">無限制</SelectItem>
+                <SelectItem value="male">男性</SelectItem>
+                <SelectItem value="female">女性</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center gap-2">
+              <Select
+                value={priceLowerBound !== null ? priceLowerBound.toString() : "null"}
+                onValueChange={(value) => handleLowerBoundChange(value)}
+              >
+                <SelectTrigger className="w-[120px] bg-white">
+                  <SelectValue placeholder="價格下限" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="null">價格下限</SelectItem> {/* 清空選項 */}
+                  {priceOptions.map((price) => (
+                    <SelectItem
+                      key={price}
+                      value={price.toString()}
+                      disabled={priceUpperBound !== null && price >= priceUpperBound} // 禁用不符合條件的選項
+                    >
+                      ${price}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 最高價格篩選器 */}
+            <div className="flex items-center gap-2">
+              <Select
+                value={priceUpperBound !== null ? priceUpperBound.toString() : "null"}
+                onValueChange={(value) => handleUpperBoundChange(value)}
+              >
+                <SelectTrigger className="w-[120px] bg-white">
+                  <SelectValue placeholder="價格上限" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="null">價格上限</SelectItem> {/* 清空選項 */}
+                  {priceOptions.map((price) => (
+                    <SelectItem
+                      key={price}
+                      value={price.toString()}
+                      disabled={priceLowerBound !== null && price <= priceLowerBound} // 禁用不符合條件的選項
+                    >
+                      ${price}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/* provider */}
+            <MultiSelect
+              options={providerList}
+              onValueChange={(selected) => setProvider(selected.length > 0 ? selected : null)}
+              defaultValue={provider ?? []} // If provider is null, pass an empty array
+              placeholder="選擇品牌"
+              variant="inverted"
+              animation={2}
+              maxCount={3} // Allow selection of all options
             />
           </div>
+        </div>
+
+        {isExpanded && (
+          <div className="bg-gray-100 px-2 mb-4 rounded-md py-2">
+            <div className="text-indigo-400 text-center px-3 font-semibold mb-2">
+              快速填寫
+            </div>
+
+            <div className="flex flex-col gap-4">
+  {/* 顏色 */}
+  <div className="flex flex-wrap gap-2 justify-center">
+    {[
+      { label: "黑色", value: "黑色" },
+      { label: "白色", value: "白色" },
+      { label: "灰色", value: "灰色" },
+      { label: "紅色", value: "紅色" },
+      { label: "橘色", value: "橘色" },
+      { label: "黃色", value: "黃色" },
+      { label: "綠色", value: "綠色" },
+      { label: "藍色", value: "藍色" },
+      { label: "紫色", value: "紫色" },
+      { label: "粉色", value: "粉色" },
+      { label: "棕色", value: "棕色" },
+    ].map((item) => (
+      <button
+        key={item.value}
+        onClick={() => {
+          if (!searchInput.includes(item.value)) {
+            setSearchInput((prev) => (prev + " " + item.value).trim());
+          }
+        }}
+        className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
+      >
+        {item.label}
+      </button>
+    ))}
+  </div>
+
+  {/* 版型 */}
+  <div className="flex flex-wrap gap-2 justify-center">
+    {[
+      { label: "短袖", value: "短袖" },
+      { label: "長袖", value: "長袖" },
+      { label: "短褲", value: "短褲" },
+      { label: "長褲", value: "長褲" },
+      { label: "短裙", value: "短裙" },
+      { label: "長裙", value: "長裙" },
+      { label: "T恤", value: "T恤" },
+      { label: "帽T", value: "帽T" },
+      { label: "襯衫", value: "襯衫" },
+      { label: "針織衫", value: "針織衫" },
+      { label: "毛衣", value: "毛衣" },
+      { label: "牛仔", value: "牛仔" },
+    ].map((item) => (
+      <button
+        key={item.value}
+        onClick={() => {
+          if (!searchInput.includes(item.value)) {
+            setSearchInput((prev) => (prev + " " + item.value).trim());
+          }
+        }}
+        className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
+      >
+        {item.label}
+      </button>
+    ))}
+  </div>
+
+  {/* 風格 */}
+  <div className="flex flex-wrap gap-2 justify-center">
+    {[
+      { label: "極簡", value: "極簡" },
+      { label: "街頭", value: "街頭" },
+      { label: "復古", value: "復古" },
+      { label: "工裝", value: "工裝" },
+      { label: "優雅", value: "優雅" },
+      { label: "日系", value: "日系" },
+      { label: "韓系", value: "韓系" },
+      { label: "美式", value: "美式" },
+      { label: "法式", value: "法式" },
+    ].map((item) => (
+      <button
+        key={item.value}
+        onClick={() => {
+          if (!searchInput.includes(item.value)) {
+            setSearchInput((prev) => (prev + " " + item.value).trim());
+          }
+        }}
+        className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
+      >
+        {item.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+          </div>
+        )}
+
+
+        <div id='prompt-suggestions' className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
+          {promptSuggestions.map((suggestion, index) => (
+            <Card
+              key={index}
+              className='bg-indigo-200/50 cursor-pointer hover:bg-indigo-200/20 transition-colors shadow-[2px_2px_0px_0px_rgba(99,102,241,0.7)] border-2 border-indigo-500/70'
+              onClick={() => handleSuggestionClick(suggestion)}
+            >
+              <CardContent className='p-4 h-full flex items-center justify-center text-center'>
+                <p className='text-sm font-semibold'>「{suggestion}」</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {
+          results.length === 0 &&
+            <div className="w-full flex items-end justify-end my-4">
+              <TourButton tourName='search' />
+            </div>
         }
       </div>
+      {loading ? (
+        <ItemListSkeleton index={0} />
+      ) : (
+        <ItemList
+          title=''
+          description={query}
+          series={results}
+          id={0}
+          index={0}
+          expandOnMount={true}
+          expandable={false}
+        />
+      )}
+      {
+        results.length > 0 &&
+        <div className="mt-8 w-full flex items-center justify-center">
+          <PaginationBar
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageNavigation}
+          />
+        </div>
+      }
+    </div>
   );
 }

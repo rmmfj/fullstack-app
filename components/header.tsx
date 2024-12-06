@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -12,6 +13,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthButton from "./auth-button";
 import AvatarMenu from "./avatar-menu";
+
+const BRAND_NAME = '一鍵穿新';
 
 const LandingPageHeader = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -81,6 +84,7 @@ const LandingPageHeader = () => {
               </Button>
             </SheetTrigger>
             <SheetContent className='w-[40vw] bg-gray-100/80'>
+              <SheetTitle>{BRAND_NAME}</SheetTitle> 
               <nav className='flex flex-col gap-4 mt-8'>
                 {menuItems.map((item) => (
                   <Link
@@ -173,10 +177,12 @@ const Header = () => {
 
   return (
     <header>
-      <div className='font-semibold bg-gray-100 border-solid border-t-2 flex p-0 pt-2 pb-0 p-4  gap-4 h-[7vh] items-center justify-between'>
+      <div className='w-full font-semibold bg-gray-100 border-solid border-t-2 flex p-0 pt-2 pb-0 p-4 h-[7vh] items-center justify-between'>
         <div className='flex gap-4 items-center justify-center'>
           {
-            !isMobile && <>
+            isMobile
+              ? <div className="font-normal">{BRAND_NAME}</div>
+              : <>
               {
                 routes.map(route => {
                   return <Link
@@ -202,9 +208,9 @@ const Header = () => {
                 <Menu className='h-6 w-6' />
               </Button>
             </SheetTrigger>
-            <SheetContent className='w-[50vw] bg-gray-100'>
+            <SheetContent className='w-[70vw] flex flex-col gap-6 justify-between bg-gray-100 pt-10'>
               <nav className='flex flex-col gap-4 mt-8'>
-                {user && <AvatarMenu />}
+                <SheetTitle className="text-center text-gray-700">{BRAND_NAME}</SheetTitle>
                 {
                   routes.map(route => {
                     return <Link
@@ -212,7 +218,7 @@ const Header = () => {
                       href={route.pathnames[0]}
                     >
                       <div
-                        className={cn("text-gray-400 flex items-center justify-center gap-2 font-normal py-2 px-4", match(pathname, route.pathnames) && 'border-t-2 border-indigo-400 bg-gray-200 text-gray-800')}
+                        className={cn("text-gray-400 flex items-center justify-center gap-2 font-normal py-3 px-4 text-xl", match(pathname, route.pathnames) && 'border-t-2 border-indigo-400 bg-gray-200 text-gray-800')}
                       >
                         {route.icon}
                         <p>
@@ -223,10 +229,24 @@ const Header = () => {
                   })
                 }
               </nav>
+              <div className="w-full flex flex-col gap-6 items-center justify-center">
+                <Separator className="bg-gray-400" />
+                { user ? <AvatarMenu isMobile={true} /> : <AuthButton isMobile={true} /> }
+              </div>
             </SheetContent>
           </Sheet>
         }
-        {!isMobile && (user ? <AvatarMenu /> : <AuthButton />)}
+       
+        {!isMobile &&
+          <div className="flex flex-reverse">
+            {
+              user
+              ? <AvatarMenu />
+              : <AuthButton />
+            }
+          </div>
+        }
+        
       </div>
     </header>
   );

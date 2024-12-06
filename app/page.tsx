@@ -8,17 +8,36 @@ import TestimonialSection from "@/components/landing-page/testimonial-section";
 import TextSearchSection from "@/components/landing-page/text-search-section";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function LandingPage() {
   const [showButton, setShowButton] = useState(true)
   const overviewSectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const threshold = window.innerHeight * 0.5;
+
+      if (scrollPosition > threshold) {
+        setShowButton(false);
+      } else {
+        setShowButton(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const scrollToSecondSection = () => {
     console.log('scroll')
     overviewSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
     setShowButton(false);
   }
+
   return (
     <div className='min-h-screen w-full bg-gray-50 flex flex-col pt-8'>
       <HeroSection />

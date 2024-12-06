@@ -91,6 +91,7 @@ const updateUserProfile = async (
       console.log("No valid fields to update");
     }
 
+    console.log(origin);
     revalidatePath(origin);
     return true;
   } catch (error) {
@@ -116,12 +117,21 @@ const getPreviewsByUserId = async (
       return [];
     }
 
-    return recommendations as RecommendationPreview[];
+    const sortedRecommendations = recommendations.sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return dateB - dateA;
+    });
+    // console.log("sortedRecommendations: ", sortedRecommendations);
+
+
+    return sortedRecommendations as RecommendationPreview[];
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get recommendations");
   }
 };
+
 
 const signOut = async () => {
   const supabase = createClient();

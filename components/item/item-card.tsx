@@ -188,11 +188,22 @@ export function MoreOptions({ children, item }: { children: React.ReactNode, ite
 
 
 const ItemCard = ({ series, userId }: { series: Series, userId?: string | null }) => {
-
+  const { toast } = useToast()
   const [isFavorite, setIsFavorite] = useState<boolean>(series.isFavorite);
 
   const toggleFavorite = async () => {
     if (!userId) return;
+    if (isFavorite) {
+      toast({
+        title: '💔 已從我的最愛移出',
+        description: '雖然你選擇將它移出，但美好的東西總會留下一點牽掛。✨\n緣分未盡，或許還會再見！',
+      });
+    } else {
+      toast({
+        title: '💖 成功加入我的最愛',
+        description: `單品 ${series.items[0].title} 已悄悄進入你的收藏✨\n這是緣分的開始，或許它正是為你而來的那一件！`,
+      });
+    }
     setIsFavorite(!isFavorite);
     await handleFavorite(userId, series.items[0].series_id);
   }
