@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { motion } from "framer-motion";
-import { Archive, House, Menu, ScanSearch, Shirt, TextSearch, WandSparkles } from "lucide-react";
+import { Archive, House, Menu, ScanSearch, Shirt, TextSearch } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -70,11 +70,10 @@ const LandingPageHeader = () => {
       >
         <div className='flex gap-4'>
           <Link href='/'>
-            <WandSparkles className='text-indigo-400' />
+            <p className='text-lg text-gray-800'>
+              {BRAND_NAME}
+            </p>
           </Link>
-          <p className='text-lg'>
-            會不會<span className='text-indigo-400'>穿搭</span>啊
-          </p>
         </div>
         {isMobile ? (
           <Sheet>
