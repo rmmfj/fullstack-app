@@ -72,7 +72,7 @@ const LandingPageHeader = () => {
         <Link href='/'>
           <div className='flex items-center jusifty-center'>
             <Image
-              src='/image/logo.svg'
+              src='/content/logo.svg'
               alt='Brand Logo'
               width={64}
               height={64}

@@ -87,7 +87,7 @@ const BrandSection = () => {
                       <Link href={brand.brandSiteUrl} target="_blank">
                         <Avatar className='cursor-pointer h-16 w-16 md:h-24 md:w-24 rounded-none'>
                           <AvatarImage
-                            src={`/image/logo/${brand.brandName.replace(' ', '').toLowerCase()}.png`}
+                            src={`/content/logo/${brand.brandName.replace(' ', '').toLowerCase()}.png`}
                             alt={`${brand.brandName}'s Logo`}
                           />
                           <AvatarFallback>{brand.brandName}</AvatarFallback>
