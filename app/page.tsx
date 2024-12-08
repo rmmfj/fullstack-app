@@ -1,5 +1,6 @@
 "use client";
 
+import BrandSection from "@/components/landing-page/brand-section";
 import HeroSection from "@/components/landing-page/hero-section";
 import ImageSearchSection from "@/components/landing-page/image-search-section";
 import OverviewSection from "@/components/landing-page/overview-section";
@@ -48,6 +49,7 @@ export default function LandingPage() {
       <RecommendationSection />
       <TextSearchSection />
       <ImageSearchSection />
+      <BrandSection />
       <TestimonialSection />
       {/* Floating Button */}
       

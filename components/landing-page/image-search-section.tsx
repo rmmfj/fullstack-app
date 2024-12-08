@@ -66,7 +66,7 @@ const ImageSearchSection = () => {
       <div className="flex flex-col md:flex-row gap-4 ml-3">
         {/* 左側圖片列表 */}
         <div className="w-full md:w-1/3 flex flex-col gap-4 py-6">
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 items-center">
             {images.map((image) => (
               <img
                 key={image.id}

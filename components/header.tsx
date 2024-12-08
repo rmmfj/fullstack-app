@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { motion } from "framer-motion";
 import { Archive, House, Menu, ScanSearch, Shirt, TextSearch } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -68,13 +69,19 @@ const LandingPageHeader = () => {
         animate={{ y: isVisible ? 0 : "-100%" }}
         transition={{ duration: 0.3 }}
       >
-        <div className='flex gap-4'>
-          <Link href='/'>
+        <Link href='/'>
+          <div className='flex items-center jusifty-center'>
+            <Image
+              src='/image/logo.svg'
+              alt='Brand Logo'
+              width={64}
+              height={64}
+            />
             <p className='text-lg text-gray-800'>
               {BRAND_NAME}
             </p>
-          </Link>
-        </div>
+          </div>
+        </Link>
         {isMobile ? (
           <Sheet>
             <SheetTrigger asChild>

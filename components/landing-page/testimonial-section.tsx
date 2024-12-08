@@ -11,33 +11,33 @@ const TESTIMONIALS = [
   {
     name: "Eva",
     content: "終於可以輕鬆找到路人穿的衣服了！以服搜服真的太神了！",
-    avatarUrl: "",
+    avatarUrl: "/image/avatar.jpeg",
   },
   {
     name: "Kevin",
     content: "我喜歡直接打出我想要的風格，不需要糾結用詞，系統懂我！",
-    avatarUrl: "",
+    avatarUrl: "/image/avatar.jpeg",
   },
   {
     name: "Lily",
     content: "幫我找到很多獨特的品牌，每次穿出去都能引起話題！",
-    avatarUrl: "",
+    avatarUrl: "/image/avatar.jpeg",
   },
   {
     name: "Cindy",
-    content: "幫我找到很多獨特的品牌，每次穿出去都能引起話題！",
-    avatarUrl: "",
+    content: "拍照就能找同款，再也不怕錯過心動穿搭！",
+    avatarUrl: "/image/avatar.jpeg",
   },
   {
     name: "Morris",
-    content: "幫我找到很多獨特的品牌，每次穿出去都能引起話題！",
-    avatarUrl: "",
+    content: "多品牌整合真方便，買衣服不用再切來切去！",
+    avatarUrl: "/image/avatar.jpeg",
   },
 ];
 
 const TestimonialSection = () => {
   return (
-    <section id='testimonial' className='py-20 w-full bg-gray-100'>
+    <section id='testimonial' className='py-20 w-full bg-gray-50'>
       <div className='max-w-[85vw] container mx-auto px-4'>
         <h2 className='text-3xl font-bold text-center mb-8'>用戶真心推薦</h2>
         <p className='text-gray-600 text-center mb-12'>

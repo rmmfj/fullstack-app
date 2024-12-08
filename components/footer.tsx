@@ -34,7 +34,7 @@ const Footer = () => {
 
       {/* 版權聲明 */}
       <div className="text-sm text-white">
-        © 2024 你會不會穿搭啊｜All rights reserved.
+        © 2024 一鍵穿新 One Click Outfit｜All rights reserved.
       </div>
     </footer>
   );
