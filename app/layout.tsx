@@ -1,4 +1,5 @@
 import TourCard from '@/components/tour-card';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 
@@ -160,6 +161,7 @@ export default async function RootLayout({
         <Footer />
         <Toaster />
       </body>
+      <GoogleAnalytics gaId="G-79W179FVTX" />
     </html>
   );
 }
