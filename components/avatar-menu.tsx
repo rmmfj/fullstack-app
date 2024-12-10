@@ -25,6 +25,8 @@ export default function AvatarMenu({ isMobile } : { isMobile?: boolean }) {
   const [user, setUser] = useState<UserType | null>(null);
   const [profile, setProfile] = useState<ProfileTable | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  
+  
   const [isEditUsernameDialogOpen, setIsEditUsernameDialogOpen] =
     useState<boolean>(false);
 
@@ -34,7 +36,9 @@ export default function AvatarMenu({ isMobile } : { isMobile?: boolean }) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      console.log('user?.id as string', user?.id as string);
       const profile = await getProfileByUserId(user?.id as string);
+      console.log('profile', profile);
       setUser(user);
       setProfile(profile);
     })();

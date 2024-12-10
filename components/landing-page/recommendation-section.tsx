@@ -157,6 +157,7 @@ const RecommendationSection = () => {
       }
       buttonText="感受專屬的穿搭推薦！"
       buttonLink='/upload'
+      screenshotUrl='/content/screenshot/recommendation.png'
     >
       {!loaded && (
         <DragAndDropImageUploaderMock

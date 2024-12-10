@@ -128,7 +128,10 @@ const Header = () => {
       const {
         data: { user: userResponse },
       } = await supabase.auth.getUser();
-      setUser(userResponse);
+      if (userResponse) {
+        setUser(userResponse);
+        console.log('userResponse', userResponse)
+      }
     })();
     if (typeof window !== "undefined") {
       window.addEventListener("resize", handleResize);
@@ -141,7 +144,7 @@ const Header = () => {
   }, []);
   const pathname = usePathname();
   console.log(pathname);
-  if (pathname === "/") return <LandingPageHeader />;
+  if (pathname === "/" || pathname === "/privacypolicy" || pathname === "/termsofservice") return <LandingPageHeader />;
 
   return (
     <header>
@@ -209,7 +212,7 @@ const Header = () => {
         {!isMobile &&
           <div className="flex flex-reverse">
             {
-              user
+              user 
               ? <AvatarMenu />
               : <AuthButton />
             }

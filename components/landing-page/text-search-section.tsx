@@ -71,6 +71,7 @@ const TextSearchSection: React.FC = () => {
       buttonLink="/search"
       reverse={true}
       darkerBackground={true}
+      screenshotUrl='/content/screenshot/text-search.png'
     >
       {/* Search Input and Button */}
       <div className="flex flex-col items-center gap-4 mt-4">

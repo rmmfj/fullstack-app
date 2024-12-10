@@ -69,6 +69,7 @@ const ImageSearchSection = () => {
       buttonLink="/image-search"
       reverse={false}
       darkerBackground={false}
+      screenshotUrl='/content/screenshot/image-search.png'
     >
       <div className="flex flex-col md:flex-row gap-4 ml-3">
         {/* 左側圖片列表 */}
