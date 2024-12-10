@@ -16,11 +16,6 @@ const validateLabelString = (
 
     const cleanedRecommendations = recommendations.replace(/```json\s*|\s*```/g, "").trim();
 
-    // if (!cleanedRecommendations.startsWith("[")) {
-    //   console.log("Cleaned recommendations does not start with '[':", cleanedRecommendations);
-    //   return [];
-    // }
-
     const firstBracketIndex = cleanedRecommendations.indexOf("[");
 
     if (firstBracketIndex === -1) {
@@ -39,7 +34,7 @@ const validateLabelString = (
     try {
       recommendationsArray = JSON.parse(validRecommendations);
     } catch (parseError) {
-      console.error("Failed to parse recommendations JSON:", parseError);
+      console.error("Failed to parse in validateLabelString:", parseError);
       return [];
     }
 

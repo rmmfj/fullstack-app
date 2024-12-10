@@ -50,14 +50,6 @@ const LandingPageHeader = () => {
     }
   }, [lastScrollY]);
 
-  const menuItems = [
-    { href: "#overview", label: "價值" },
-    { href: "#recommendation-feature", label: "穿搭推薦" },
-    { href: "#text-search-feature", label: "文字搜尋" },
-    { href: "#image-search-feature", label: "以服搜服" },
-    { href: "#testimonial", label: "用戶回饋" },
-  ];
-
   return (
     <header className='z-50'>
       <motion.div
@@ -82,37 +74,6 @@ const LandingPageHeader = () => {
             </p>
           </div>
         </Link>
-        {isMobile ? (
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant='ghost' size='icon'>
-                <Menu className='h-6 w-6' />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className='w-[40vw] bg-gray-100/80'>
-              <SheetTitle>{BRAND_NAME}</SheetTitle> 
-              <nav className='flex flex-col gap-4 mt-8'>
-                {menuItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className='text-lg font-medium cursor-pointer'
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        ) : (
-          <div className='flex gap-4 font-light'>
-            {menuItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        )}
       </motion.div>
     </header>
   );
@@ -157,6 +118,7 @@ const match = (pathname: string, pathnames: string[]) => {
 const Header = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -208,9 +170,9 @@ const Header = () => {
           }
         </div>
         {
-          isMobile && <Sheet>
+          isMobile && <Sheet open={isVisible}>
             <SheetTrigger asChild>
-              <Button variant='ghost' size='icon'>
+              <Button onClick={() => setIsVisible(true)} variant='ghost' size='icon'>
                 <Menu className='h-6 w-6' />
               </Button>
             </SheetTrigger>
@@ -220,6 +182,7 @@ const Header = () => {
                 {
                   routes.map(route => {
                     return <Link
+                      onClick={() => setIsVisible(false)}
                       key={route.pathnames[0]}
                       href={route.pathnames[0]}
                     >

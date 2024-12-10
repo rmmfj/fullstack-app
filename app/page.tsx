@@ -5,7 +5,6 @@ import HeroSection from "@/components/landing-page/hero-section";
 import ImageSearchSection from "@/components/landing-page/image-search-section";
 import OverviewSection from "@/components/landing-page/overview-section";
 import RecommendationSection from "@/components/landing-page/recommendation-section";
-import TestimonialSection from "@/components/landing-page/testimonial-section";
 import TextSearchSection from "@/components/landing-page/text-search-section";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
@@ -50,7 +49,7 @@ export default function LandingPage() {
       <TextSearchSection />
       <ImageSearchSection />
       <BrandSection />
-      <TestimonialSection />
+      {/* <TestimonialSection /> */}
       {/* Floating Button */}
       
       {showButton && (

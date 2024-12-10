@@ -41,7 +41,7 @@ const handleRecommendation = async (
     while (recommendations?.length === 0 || cleanedRecommendations.length === 0) {
       if (attempts >= maxRetries) {
         console.error("Max retries reached for handling recommendation.");
-        return "";
+        return "-1";
       }
       console.log(`handleRecommendation while loop at iteration ${attempts}`);
       const prompt = constructPromptForRecommendation({ clothingType, gender, numMaxSuggestion });

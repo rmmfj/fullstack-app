@@ -26,7 +26,7 @@ const vectorSearchForRecommendation = async (
       ORDER BY ${viewName}.embedding <#> $1::vector
       LIMIT $3;
     `, suggestedEmbedding, matchThreshold, numMaxItem);
-    if (!items.length) {
+    if (items === null || !items.length) {
       console.error("No items found for vectorSearchForRecommendation");
       return [];
     }
@@ -106,7 +106,7 @@ const vectorSearchForSearching = async (
     const mainQueryParams = [...queryParams, pageSize, offset];
 
     const items: SimplifiedItemTable[] = await prisma.$queryRawUnsafe(mainQuery, ...mainQueryParams);
-    if (!items.length) {
+    if (items === null || !items.length) {
       console.error("No items found for vectorSearchForSearching");
       return { series: [], totalItems };
     }
@@ -147,7 +147,7 @@ const semanticSearchForRecommendation = async ({
       clothing_type,
     );
 
-    if (!similarItems || similarItems.length === 0) {
+    if (similarItems === null || similarItems.length === 0 || !similarItems) {
       console.error("No similar items found in semanticSearchForRecommendation");
       return [];
     }
@@ -184,7 +184,7 @@ const semanticSearchWithoutLogin = async ({
       clothing_type,
     );
 
-    if (!similarItems || similarItems.length === 0) {
+    if (similarItems === null || similarItems.length === 0 || !similarItems) {
       console.error("No similar items found in vectorSearchForRecommendation");
       return [];
     }
@@ -249,16 +249,16 @@ const semanticSearchForSearching = async ({
   user_id: string | null;
 }): Promise<SearchResult | null> => {
   try {
-    console.log({
-      suggestedLabelString,
-      gender,
-      priceLowerBound,
-      priceUpperBound,
-      providers,
-      clothingType,
-      page,
-      user_id,
-    });
+    // console.log({
+    //   suggestedLabelString,
+    //   gender,
+    //   priceLowerBound,
+    //   priceUpperBound,
+    //   providers,
+    //   clothingType,
+    //   page,
+    //   user_id,
+    // });
     const searchResultData = await vectorSearchForSearching(
       suggestedLabelString,
       page,
@@ -270,7 +270,7 @@ const semanticSearchForSearching = async ({
       clothingType
     );
 
-    if (!searchResultData || searchResultData.series.length === 0) {
+    if (searchResultData === null || searchResultData.series.length === 0 || !searchResultData) {
       console.error("No search results found in semanticSearchForSearching");
       return { series: [], totalPages: 0 };
     }
