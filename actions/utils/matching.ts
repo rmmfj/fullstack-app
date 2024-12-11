@@ -15,15 +15,15 @@ const vectorSearchForRecommendation = async (
     let clothingTypeString = clothing_type === "top" ? "bottom" : "top";
     let genderString = gender === "neutral" ? "all" : gender;
     const suggestedEmbedding = await generateEmbedding(suggestedLabelString);
-    const matchThreshold = 0.2;
+    const matchThreshold = 0.85;
 
     const viewName = `${genderString}_${clothingTypeString}_item_matview`;
 
     const items: SimplifiedItemTable[] = await prisma.$queryRawUnsafe(`
       SELECT id, clothing_type, color, external_link, gender, image_url, label_string, price, provider, series_id, title
       FROM ${viewName}
-      WHERE ${viewName}.embedding <#> $1::vector < $2
-      ORDER BY ${viewName}.embedding <#> $1::vector
+      WHERE ${viewName}.embedding <=> $1::vector > $2
+      ORDER BY ${viewName}.embedding <=> $1::vector DESC
       LIMIT $3;
     `, suggestedEmbedding, matchThreshold, numMaxItem);
     if (items === null || !items.length) {
@@ -58,12 +58,12 @@ const vectorSearchForSearching = async (
 ): Promise<{ series: Series[]; totalItems: number } | null> => {
   try {
     const suggestedEmbedding = await generateEmbedding(suggestedLabelString);
-    const matchThreshold = -0.9;
+    const matchThreshold = 0.85;
     let genderString = gender === "neutral" ? "all" : gender;
     const viewName = `${genderString}_item_matview`;
     const offset = (page - 1) * pageSize;
 
-    let filterConditions = `${viewName}.embedding <#> $1::vector < $2`;
+    let filterConditions = `${viewName}.embedding <=> $1::vector > $2`;
     const queryParams: any[] = [suggestedEmbedding, matchThreshold];
     let paramIndex = 3;
 
@@ -100,7 +100,7 @@ const vectorSearchForSearching = async (
       SELECT id, clothing_type, color, external_link, gender, image_url, label_string, price, provider, series_id, title
       FROM ${viewName}
       WHERE ${filterConditions}
-      ORDER BY embedding <#> $1::vector
+      ORDER BY embedding <=> $1::vector DESC
       LIMIT $${paramIndex++} OFFSET $${paramIndex};
     `;
     const mainQueryParams = [...queryParams, pageSize, offset];

@@ -7,7 +7,9 @@ import {
 } from "./utils/matching";
 import {
   constructPromptForImageSearch,
+  constructPromptForImageSearchWithoutGender,
   constructPromptForTextSearch,
+  constructPromptForTextSearchWithoutGender,
 } from "./utils/prompt";
 import { validateLabelString } from "./utils/validate";
 
@@ -69,33 +71,44 @@ const getLabelString = async (
   return { labelString: "", clothing_type: undefined, gender: undefined };
 };
 
+// 圖片搜尋的函式
 const getLabelStringForImageSearch = async (
   gender: Gender | undefined,
   model: string,
   imageUrl: string
 ): Promise<{ labelString: string; clothing_type?: ClothingType; gender?: Gender }> => {
+  const promptGenerator = gender
+  ? ({ gender }: { gender: Gender }) => constructPromptForImageSearch({ gender })
+    : () => constructPromptForImageSearchWithoutGender();
+
   return await getLabelString(
     model,
     async (model, prompt, imageUrl) => await sendImgURLAndPromptToGPT({ model, prompt, imageUrl }),
-    ({ gender }) => constructPromptForImageSearch({ gender }),
+    promptGenerator,
     gender,
     imageUrl
   );
 };
 
+// 文字搜尋的函式
 const getLabelStringForTextSearch = async (
-  gender: Gender|undefined,
+  gender: Gender | undefined,
   model: string,
   query: string
 ): Promise<{ labelString: string; clothing_type?: ClothingType; gender?: Gender }> => {
+  const promptGenerator = gender
+  ? ({ gender, imageUrlOrQuery }: { gender: Gender; imageUrlOrQuery: string }) => constructPromptForTextSearch({ query: imageUrlOrQuery, gender })
+  : ({ imageUrlOrQuery }: { imageUrlOrQuery: string }) => constructPromptForTextSearchWithoutGender({ query: imageUrlOrQuery });
+
   return await getLabelString(
     model,
     async (model, prompt) => await sendPromptToGPT({ model, prompt }),
-    ({ gender, imageUrlOrQuery }) => constructPromptForTextSearch({ query: imageUrlOrQuery, gender }),
+    promptGenerator,
     gender,
     query
   );
 };
+
 
 
 const handleSearch = async (
