@@ -152,6 +152,7 @@ export default function ImageSearchPage() {
       maxSizeMB: 1,
       maxWidthOrHeight: 1920,
       useWebWorker: true,
+      fileType: "image/jpeg"
     }
     try {
       const compressedFile = await imageCompression(data.uploadedImage[0], options);
