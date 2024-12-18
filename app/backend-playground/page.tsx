@@ -58,18 +58,19 @@ const generateEmbedding = async (text: string): Promise<number[] | null> => {
 
 export default async function Playground2() {
   try {
-    const labelString = "顏色: 無限制, 服裝類型: 上衣, 剪裁版型: 合身, 設計特點: 菱格紋, 材質: 棉混紡, 細節: 無口袋設計, 領子: 圓領, 袖子: 長袖";
-
+    // const labelString = "顏色: 無限制, 服裝類型: 上衣, 剪裁版型: 合身, 設計特點: 菱格紋, 材質: 棉混紡, 細節: 無口袋設計, 領子: 圓領, 袖子: 長袖";
+    const labelString = "顏色: 黑色, 服裝類型: 西裝外套, 剪裁版型: 修身剪裁，展現清晰的肩線和腰線, 設計特點: 經典翻領設計，具有現代感, 材質: 高品質羊毛混紡，透氣且有彈性, 細節: 內襯精美，設計有實用口袋, 領子: 翻領, 袖子: 長袖";
     // List of item IDs to search for similar items
     const itemIds = [
-      '96961199-4a07-447e-b12b-52d9d2d0217b',
+      '0154c71a-da31-43fc-863b-c04b04b60556',
       '6028e538-8304-4140-b1c8-e0a886b55bf8',
       'd7e5117f-5353-4e8f-bf75-c3bdbf9b06a7',
       '4be5de39-accd-40cc-92ed-f0b4ca506766',
       '3fa75e2a-a52b-4ce9-a14e-07036b32ce0e',
       '4193e078-baea-4558-84e2-5ad4016549ff',
       '000d83a3-12d2-4751-947c-a781ef513959', // 隨便褲子
-      '0ba604d6-9fc9-49a7-b7c4-2060ee159d02' //第一名
+      '0ba604d6-9fc9-49a7-b7c4-2060ee159d02',
+      '0069a243-e7be-4425-ba05-28e9917f4d00'
     ];
 
     // Generate the embedding for the label string

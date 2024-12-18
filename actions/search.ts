@@ -122,6 +122,7 @@ const handleSearch = async (
   clothingType?: ClothingType,
 ): Promise<SearchResult | null> => {
   try {
+    console.log("labelString: ", labelString);
     const searchResult: SearchResult | null = await semanticSearchForSearching({
       suggestedLabelString: labelString,
       gender,

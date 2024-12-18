@@ -15,6 +15,7 @@ import {
 } from "./utils/matching";
 import {
   constructPromptForRecommendation,
+  constructPromptForRecommendationWithoutGender,
 } from "./utils/prompt";
 import { validateLabelString } from "./utils/validate";
 
@@ -42,7 +43,12 @@ const handleRecommendation = async (
         return "-1";
       }
       console.log(`handleRecommendation while loop at iteration ${attempts}`);
-      const prompt = constructPromptForRecommendation({ clothingType, gender, numMaxSuggestion });
+      let prompt = "";
+      if(gender !== "nertral")
+        prompt = constructPromptForRecommendation({ clothingType, gender, numMaxSuggestion });
+      else
+        prompt = constructPromptForRecommendationWithoutGender({ clothingType, numMaxSuggestion})
+      // console.log("prompt: ", prompt);
       recommendations = await sendImgURLAndPromptToGPT({ model, prompt, imageUrl });
       
       if (!recommendations) continue;
@@ -65,6 +71,7 @@ const handleRecommendation = async (
         styleName: rec.styleName,
         description: rec.description,
       });
+      console.log("labelString: ", rec.labelString);
       
       const results = await semanticSearchForRecommendation({
         suggestionId,
