@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 
 
+import { MultiSelect } from "@/components/multi-select";
 import PaginationBar from "@/components/pagination-bar";
 import TourButton from "@/components/tour-button";
 import { Button } from "@/components/ui/button";
@@ -22,13 +23,9 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
-import { MultiSelect } from "@/components/multi-select";
 
 const schema = z.object({
   uploadedImage: (typeof window === "undefined"
@@ -93,10 +90,6 @@ export default function SearchPage() {
   const [searchInput, setSearchInput] = useState("");
   const [results, setResults] = useState<Series[]>([]);
   const [promptSuggestions, setPromptSuggestions] = useState<string[]>([]);
-  const [selectedColor, setSelectedColor] = useState<string>(""); // 顏色
-  const [selectedVersion, setSelectedVersion] = useState<string>(""); // 版型
-  const [selectedStyle, setSelectedStyle] = useState<string>(""); // 風格
-  const [selectedType, setSelectedType] = useState<string>(""); // 款式
   const [priceLowerBound, setPriceLowerBound] = useState<number | null>(null);
   const [priceUpperBound, setPriceUpperBound] = useState<number | null>(null);
   const [provider, setProvider] = useState<string[] | null>(null);
@@ -203,7 +196,7 @@ export default function SearchPage() {
     setTotalPages(res?.totalPages as number);
     setPage(1);
     setQuery(searchInput);
-    setSearchInput("");
+    // setSearchInput("");
     // console.log(res?.series);
     setLoading(false);
   };
@@ -254,13 +247,14 @@ export default function SearchPage() {
         </div>
 
         <div className="bg-gray-100 p-2 mb-4 rounded-md">
-          <div className="flex gap-2 items-center justify-begin">
+          <div className="flex flex-col gap-2 items-start justify-start md:flex-row md:items-center md:justify-begin">
+            {/* 性別選單 */}
             <Select onValueChange={(value: Gender) => {
               setGender(value);
               console.log(value);
             }}>
-              <SelectTrigger className="w-[100px] bg-white">
-                <SelectValue id='gender-select' placeholder="性別" />
+              <SelectTrigger className="w-full md:w-[100px] bg-white">
+                <SelectValue id="gender-select" placeholder="性別" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="neutral">無限制</SelectItem>
@@ -269,21 +263,22 @@ export default function SearchPage() {
               </SelectContent>
             </Select>
 
-            <div className="flex items-center gap-2">
+            {/* 價格下限選單 */}
+            <div className="flex items-center gap-2 w-full md:w-auto">
               <Select
                 value={priceLowerBound !== null ? priceLowerBound.toString() : "null"}
                 onValueChange={(value) => handleLowerBoundChange(value)}
               >
-                <SelectTrigger className="w-[120px] bg-white">
+                <SelectTrigger className="w-full md:w-[120px] bg-white">
                   <SelectValue placeholder="價格下限" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="null">價格下限</SelectItem> {/* 清空選項 */}
+                  <SelectItem value="null">價格下限</SelectItem>
                   {priceOptions.map((price) => (
                     <SelectItem
                       key={price}
                       value={price.toString()}
-                      disabled={priceUpperBound !== null && price >= priceUpperBound} // 禁用不符合條件的選項
+                      disabled={priceUpperBound !== null && price >= priceUpperBound}
                     >
                       ${price}
                     </SelectItem>
@@ -292,22 +287,22 @@ export default function SearchPage() {
               </Select>
             </div>
 
-            {/* 最高價格篩選器 */}
-            <div className="flex items-center gap-2">
+            {/* 價格上限選單 */}
+            <div className="flex items-center gap-2 w-full md:w-auto">
               <Select
                 value={priceUpperBound !== null ? priceUpperBound.toString() : "null"}
                 onValueChange={(value) => handleUpperBoundChange(value)}
               >
-                <SelectTrigger className="w-[120px] bg-white">
+                <SelectTrigger className="w-full md:w-[120px] bg-white">
                   <SelectValue placeholder="價格上限" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="null">價格上限</SelectItem> {/* 清空選項 */}
+                  <SelectItem value="null">價格上限</SelectItem>
                   {priceOptions.map((price) => (
                     <SelectItem
                       key={price}
                       value={price.toString()}
-                      disabled={priceLowerBound !== null && price <= priceLowerBound} // 禁用不符合條件的選項
+                      disabled={priceLowerBound !== null && price <= priceLowerBound}
                     >
                       ${price}
                     </SelectItem>
@@ -315,16 +310,19 @@ export default function SearchPage() {
                 </SelectContent>
               </Select>
             </div>
-            {/* provider */}
-            <MultiSelect
-              options={providerList}
-              onValueChange={(selected) => setProvider(selected.length > 0 ? selected : null)}
-              defaultValue={provider ?? []} // If provider is null, pass an empty array
-              placeholder="選擇品牌"
-              variant="inverted"
-              animation={2}
-              maxCount={3} // Allow selection of all options
-            />
+
+            {/* 品牌篩選器 */}
+            <div className="w-full md:w-auto">
+              <MultiSelect
+                options={providerList}
+                onValueChange={(selected) => setProvider(selected.length > 0 ? selected : null)}
+                defaultValue={provider ?? []}
+                placeholder="選擇品牌"
+                variant="inverted"
+                animation={2}
+                maxCount={3}
+              />
+            </div>
           </div>
         </div>
 
@@ -335,97 +333,95 @@ export default function SearchPage() {
             </div>
 
             <div className="flex flex-col gap-4">
-  {/* 顏色 */}
-  <div className="flex flex-wrap gap-2 justify-center">
-    {[
-      { label: "黑色", value: "黑色" },
-      { label: "白色", value: "白色" },
-      { label: "灰色", value: "灰色" },
-      { label: "紅色", value: "紅色" },
-      { label: "橘色", value: "橘色" },
-      { label: "黃色", value: "黃色" },
-      { label: "綠色", value: "綠色" },
-      { label: "藍色", value: "藍色" },
-      { label: "紫色", value: "紫色" },
-      { label: "粉色", value: "粉色" },
-      { label: "棕色", value: "棕色" },
-    ].map((item) => (
-      <button
-        key={item.value}
-        onClick={() => {
-          if (!searchInput.includes(item.value)) {
-            setSearchInput((prev) => (prev + " " + item.value).trim());
-          }
-        }}
-        className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
-      >
-        {item.label}
-      </button>
-    ))}
-  </div>
+              {/* 顏色 */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  { label: "黑色", value: "黑色" },
+                  { label: "白色", value: "白色" },
+                  { label: "灰色", value: "灰色" },
+                  { label: "紅色", value: "紅色" },
+                  { label: "橘色", value: "橘色" },
+                  { label: "黃色", value: "黃色" },
+                  { label: "綠色", value: "綠色" },
+                  { label: "藍色", value: "藍色" },
+                  { label: "紫色", value: "紫色" },
+                  { label: "粉色", value: "粉色" },
+                  { label: "棕色", value: "棕色" },
+                ].map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => {
+                      if (!searchInput.includes(item.value)) {
+                        setSearchInput((prev) => (prev + " " + item.value).trim());
+                      }
+                    }}
+                    className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
 
-  {/* 版型 */}
-  <div className="flex flex-wrap gap-2 justify-center">
-    {[
-      { label: "短袖", value: "短袖" },
-      { label: "長袖", value: "長袖" },
-      { label: "短褲", value: "短褲" },
-      { label: "長褲", value: "長褲" },
-      { label: "短裙", value: "短裙" },
-      { label: "長裙", value: "長裙" },
-      { label: "T恤", value: "T恤" },
-      { label: "帽T", value: "帽T" },
-      { label: "襯衫", value: "襯衫" },
-      { label: "針織衫", value: "針織衫" },
-      { label: "毛衣", value: "毛衣" },
-      { label: "牛仔", value: "牛仔" },
-    ].map((item) => (
-      <button
-        key={item.value}
-        onClick={() => {
-          if (!searchInput.includes(item.value)) {
-            setSearchInput((prev) => (prev + " " + item.value).trim());
-          }
-        }}
-        className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
-      >
-        {item.label}
-      </button>
-    ))}
-  </div>
+              {/* 版型 */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  { label: "短袖", value: "短袖" },
+                  { label: "長袖", value: "長袖" },
+                  { label: "短褲", value: "短褲" },
+                  { label: "長褲", value: "長褲" },
+                  { label: "短裙", value: "短裙" },
+                  { label: "長裙", value: "長裙" },
+                  { label: "T恤", value: "T恤" },
+                  { label: "帽T", value: "帽T" },
+                  { label: "襯衫", value: "襯衫" },
+                  { label: "針織衫", value: "針織衫" },
+                  { label: "毛衣", value: "毛衣" },
+                  { label: "牛仔", value: "牛仔" },
+                ].map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => {
+                      if (!searchInput.includes(item.value)) {
+                        setSearchInput((prev) => (prev + " " + item.value).trim());
+                      }
+                    }}
+                    className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
 
-  {/* 風格 */}
-  <div className="flex flex-wrap gap-2 justify-center">
-    {[
-      { label: "極簡", value: "極簡" },
-      { label: "街頭", value: "街頭" },
-      { label: "復古", value: "復古" },
-      { label: "工裝", value: "工裝" },
-      { label: "優雅", value: "優雅" },
-      { label: "日系", value: "日系" },
-      { label: "韓系", value: "韓系" },
-      { label: "美式", value: "美式" },
-      { label: "法式", value: "法式" },
-    ].map((item) => (
-      <button
-        key={item.value}
-        onClick={() => {
-          if (!searchInput.includes(item.value)) {
-            setSearchInput((prev) => (prev + " " + item.value).trim());
-          }
-        }}
-        className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
-      >
-        {item.label}
-      </button>
-    ))}
-  </div>
-</div>
+              {/* 風格 */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  { label: "極簡", value: "極簡" },
+                  { label: "街頭", value: "街頭" },
+                  { label: "復古", value: "復古" },
+                  { label: "工裝", value: "工裝" },
+                  { label: "優雅", value: "優雅" },
+                  { label: "日系", value: "日系" },
+                  { label: "韓系", value: "韓系" },
+                  { label: "美式", value: "美式" },
+                  { label: "法式", value: "法式" },
+                ].map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => {
+                      if (!searchInput.includes(item.value)) {
+                        setSearchInput((prev) => (prev + " " + item.value).trim());
+                      }
+                    }}
+                    className="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md shadow-sm text-sm font-medium"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
           </div>
         )}
-
-
         <div id='prompt-suggestions' className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
           {promptSuggestions.map((suggestion, index) => (
             <Card
@@ -441,9 +437,9 @@ export default function SearchPage() {
         </div>
         {
           results.length === 0 &&
-            <div className="w-full flex items-end justify-end my-4">
-              <TourButton tourName='search' />
-            </div>
+          <div className="w-full flex items-end justify-end my-4">
+            <TourButton tourName='search' />
+          </div>
         }
       </div>
       {loading ? (
@@ -467,6 +463,14 @@ export default function SearchPage() {
             totalPages={totalPages}
             onPageChange={handlePageNavigation}
           />
+        </div>
+      }
+      {
+        results.length === 0 && query !== "" &&
+        <div className="w-full text-center">
+            很抱歉，暫時找不到符合您描述的商品 😢
+            <br />
+            試試調整搜尋描述或添加更多細節，讓我們幫您找到更適合的單品！
         </div>
       }
     </div>

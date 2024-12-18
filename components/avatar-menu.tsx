@@ -16,7 +16,7 @@ import {
 import { ProfileTable } from "@/type";
 import { createClient } from "@/utils/supabase/client";
 import { User as UserType } from "@supabase/supabase-js";
-import { Camera, Tag } from "lucide-react";
+import { Tag } from "lucide-react";
 import { useEffect, useState } from "react";
 import EditUsernameDialog from "./edit-username-diaglog";
 import LogoutButton from "./logout-button";
@@ -25,6 +25,8 @@ export default function AvatarMenu({ isMobile } : { isMobile?: boolean }) {
   const [user, setUser] = useState<UserType | null>(null);
   const [profile, setProfile] = useState<ProfileTable | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  
+  
   const [isEditUsernameDialogOpen, setIsEditUsernameDialogOpen] =
     useState<boolean>(false);
 
@@ -34,7 +36,9 @@ export default function AvatarMenu({ isMobile } : { isMobile?: boolean }) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      console.log('user?.id as string', user?.id as string);
       const profile = await getProfileByUserId(user?.id as string);
+      console.log('profile', profile);
       setUser(user);
       setProfile(profile);
     })();
@@ -64,13 +68,6 @@ export default function AvatarMenu({ isMobile } : { isMobile?: boolean }) {
       >
         <Tag className='mr-2 h-4 w-4' />
         <span>更改使用者名稱</span>
-      </div>
-      <div
-        className='flex items-center justify-center gap-4 cursor-pointer'
-        // onClick={handleChangeProfilePicture}
-      >
-        <Camera className='mr-2 h-4 w-4' />
-        <span>更改使用者頭像</span>
       </div>
       <div className="flex w-full justify-end">
         <LogoutButton isMobile={true} />
@@ -115,14 +112,7 @@ export default function AvatarMenu({ isMobile } : { isMobile?: boolean }) {
             <Tag className='mr-2 h-4 w-4' />
             <span>更改使用者名稱</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            className='cursor-pointer'
-            // onClick={handleChangeProfilePicture}
-          >
-            <Camera className='mr-2 h-4 w-4' />
-            <span>更改使用者頭像</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
+            <DropdownMenuSeparator />
           <div className="flex w-full justify-end">
             <LogoutButton />
           </div>

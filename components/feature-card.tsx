@@ -14,9 +14,7 @@ const FeatureCard = ({
 }) => {
   return (
     <motion.div
-      initial={{ scale: 0.8 }}
       whileInView={{ scale: 1 }}
-      whileHover={{ scale: 1.05 }}
       className='md:w-[24rem] hover:shadow-lg w-full bg-gray-50 rounded-xl p-6 transition-all duration-300 ease-in-out flex flex-col gap-2'
     >
       <div className='text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 '>

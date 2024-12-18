@@ -1,10 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 const PrivacyPolicy = () => {
-  const router = useRouter();
-
   return (
     <div className="p-6 max-w-3xl mx-auto">
       {/* 隱私權政策內容 */}

@@ -50,10 +50,10 @@ export default function Login() {
           繼續操作即表示您同意我們的
         </p>
         <div className="flex justify-center space-x-6 text-sm mb-4">
-          <Link href="/termsofservice" className="underline">
+          <Link href="/termsofservice?origin=/login" className="underline">
             服務條款
           </Link>
-          <Link href="/privacypolicy" className="underline">
+          <Link href="/privacypolicy?origin=/login" className="underline">
             隱私權政策
           </Link>
         </div>

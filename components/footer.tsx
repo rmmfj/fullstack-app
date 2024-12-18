@@ -1,6 +1,6 @@
 "use client";
 
-import { Facebook, Instagram } from "lucide-react";
+import { Instagram } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -14,12 +14,13 @@ const Footer = () => {
     <footer className="bg-indigo-400 flex flex-col w-full border-t border-t-foreground/10 p-8 justify-center text-center text-xs">
       {/* 社群連結 */}
       <div className="flex justify-center space-x-4 mb-4">
-        <a href="#" className="text-white hover:text-gray-400">
+        <Link
+          href="https://www.instagram.com/one_click_outfit"
+          target='_blank'
+          className="text-white hover:text-gray-400"
+        >
           <Instagram />
-        </a>
-        <a href="#" className="text-white hover:text-gray-400">
-          <Facebook />
-        </a>
+        </Link>
       </div>
 
       {/* 服務條款和隱私權政策按鈕 */}

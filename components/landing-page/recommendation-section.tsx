@@ -143,16 +143,21 @@ const RecommendationSection = () => {
   return (
     <Section
       id='recommendation-feature'
-      title='推薦功能'
-      slogan='上傳搭配，輕鬆找到專屬穿搭靈感！'
+      title='✨ 推薦功能'
+      // slogan='上傳搭配，輕鬆找到專屬穿搭靈感！'
+      slogan='上半身搭配下半身，讓搭配更有創意！'
       description={
-        `上傳您的上半身或下半身穿搭圖片，
-        系統會自動推薦三種搭配的建議！
-        這個功能特別適合已經購買了一件衣服但不確定如何搭配的使用者，
-        試試看把衣服拖曳進視窗來找找推薦的搭配吧。`
+        // `上傳您的上半身或下半身穿搭圖片，
+        // 系統會自動推薦三種搭配的建議！
+        // 這個功能特別適合已經購買了一件衣服但不確定如何搭配的使用者，
+        // 試試看把衣服拖曳進視窗來找找推薦的搭配吧。`
+        `還在為怎麼搭配衣服煩惱嗎？只要上傳你的上半身或下半身服飾，
+        AI 智能馬上為你推薦最合適的下半身或上半身，給你最時尚的搭配建議！
+        不論是正式場合還是休閒日常，瞬間變身穿搭達人！`
       }
       buttonText="感受專屬的穿搭推薦！"
       buttonLink='/upload'
+      screenshotUrl='/content/screenshot/recommendation.png'
     >
       {!loaded && (
         <DragAndDropImageUploaderMock
