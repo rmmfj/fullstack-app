@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-
 import { ArrowRight, ScanSearch, Shirt, TextSearch } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const FEATURES = [
   {
@@ -10,6 +10,7 @@ const FEATURES = [
     icon: <Shirt className="w-4 h-4" />,
     desrciption: '上傳服飾照片，找到最適服飾單品。輕鬆解決每天出門前的穿衣煩惱～',
     href: '/upload',
+    gif_url: '/content/tutorial/recommendation.gif',
     buttonText: '感受專屬的穿搭推薦',
   },
   {
@@ -17,6 +18,7 @@ const FEATURES = [
     icon: <TextSearch className="w-4 h-4" />,
     desrciption: '輸入需求，快速篩選最符合的商品。不用花時間檢索，系統懂你在說啥！',
     href: '/search',
+    gif_url: '/content/tutorial/text-search.gif',
     buttonText: '探索相似款式',
   },
   {
@@ -24,6 +26,7 @@ const FEATURES = [
     icon: <ScanSearch className="w-4 h-4" />,
     desrciption: '上傳服飾照片，搜尋相似的商品。看到喜歡的穿搭，隨時都能找到購買方式。',
     href: '/image-search',
+    gif_url: '/content/tutorial/image-search.gif',
     buttonText: '快速找到理想的單品',
   }
 ]
@@ -63,6 +66,13 @@ export default function HomePage() {
                     {feature.desrciption}
                   </p>
                 </div>
+                <Image
+                  src={feature.gif_url}
+                  width={1024}
+                  height={1024}
+                  className='w-full'
+                  alt={''}
+                />
                 <div className="px-5 py-3">
                   <Link 
                     href={feature.href}

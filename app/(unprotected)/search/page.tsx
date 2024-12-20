@@ -6,7 +6,7 @@ import ItemListSkeleton from "@/components/item/item-list-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { LoadingButton } from "@/components/ui/loading-button";
-import { Gender, Series } from "@/type";
+import { ClothingType, Gender, Series } from "@/type";
 import { SearchIcon, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -86,6 +86,7 @@ export default function SearchPage() {
   const [labelString, setLabelString] = useState<string>('');
   const [query, setQuery] = useState<string>("");
   const [gender, setGender] = useState<Gender>('neutral');
+  const [clothingType, setClothingType] = useState<ClothingType | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState("");
   const [results, setResults] = useState<Series[]>([]);
@@ -113,7 +114,7 @@ export default function SearchPage() {
     const numValue = value === "null" ? null : Number(value);
     setPriceLowerBound(numValue);
     if (numValue !== null && priceUpperBound !== null && numValue >= priceUpperBound) {
-      setPriceUpperBound(null); // 清空不符合條件的最高價格
+      setPriceUpperBound(null);  // 清空不符合條件的最高價格
     }
   };
 
@@ -121,7 +122,7 @@ export default function SearchPage() {
     const numValue = value === "null" ? null : Number(value);
     setPriceUpperBound(numValue);
     if (numValue !== null && priceLowerBound !== null && numValue <= priceLowerBound) {
-      setPriceLowerBound(null); // 清空不符合條件的最低價格
+      setPriceLowerBound(null);  // 清空不符合條件的最低價格
     }
   };
 
@@ -157,7 +158,16 @@ export default function SearchPage() {
           data: { user: userResponse },
         } = await supabase.auth.getUser();
         setUserId(userResponse?.id as string);
-        const res = await handleSearch(searchParams.get('label_string') as string, searchParams.get('gender'), page, userResponse ? userResponse.id : null, priceLowerBound?priceLowerBound:undefined, priceUpperBound?priceUpperBound:undefined, provider?provider:undefined, undefined);
+        const res = await handleSearch(
+          searchParams.get('label_string') as string,
+          searchParams.get('gender'),
+          page,
+          userResponse ? userResponse.id : null,
+          priceLowerBound ? priceLowerBound : undefined,
+          priceUpperBound ? priceUpperBound : undefined,
+          provider ? provider : undefined,
+          clothingType ? clothingType : undefined
+        );
         setResults([...(res?.series as Series[])] as Series[]);
         setTotalPages(res?.totalPages as number);
         setPage(1);
@@ -191,7 +201,16 @@ export default function SearchPage() {
     setLoading(true);
     const label = await getLabelStringForTextSearch(gender, "gpt-4o-mini", searchInput);
     setLabelString(label.labelString);
-    const res = await handleSearch(label.labelString, gender, page, userId, priceLowerBound?priceLowerBound:undefined, priceUpperBound?priceUpperBound:undefined, provider?provider:undefined, undefined);
+    const res = await handleSearch(
+      label.labelString,
+      gender,
+      page,
+      userId,
+      priceLowerBound ? priceLowerBound : undefined,
+      priceUpperBound ? priceUpperBound : undefined,
+      provider ? provider : undefined,
+      clothingType ? clothingType : undefined
+    );
     setResults([...(res?.series as Series[])] as Series[]);
     setTotalPages(res?.totalPages as number);
     setPage(1);
@@ -205,7 +224,16 @@ export default function SearchPage() {
     setPage(page);
     setLoading(true);
     console.log(labelString)
-    const res = await handleSearch(labelString, gender, page, userId, priceLowerBound?priceLowerBound:undefined, priceUpperBound?priceUpperBound:undefined, provider?provider:undefined, undefined);
+    const res = await handleSearch(
+      labelString,
+      gender,
+      page,
+      userId,
+      priceLowerBound ? priceLowerBound : undefined,
+      priceUpperBound ? priceUpperBound : undefined,
+      provider ? provider : undefined,
+      clothingType ? clothingType : undefined
+    );
     console.log(res);
     setResults([...(res?.series as Series[])] as Series[]);
     setLoading(false);
@@ -260,6 +288,24 @@ export default function SearchPage() {
                 <SelectItem value="neutral">無限制</SelectItem>
                 <SelectItem value="male">男性</SelectItem>
                 <SelectItem value="female">女性</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* 性別選單 */}
+            <Select onValueChange={(value: Gender) => {
+              if (value === 'unlimited') {
+                setClothingType(null);
+              } else {
+                setClothingType(value);
+              }
+            }}>
+              <SelectTrigger className="w-full md:w-[100px] bg-white">
+                <SelectValue id="clothing-type-select" placeholder="服飾" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="unlimited">無限制</SelectItem>
+                <SelectItem value="top">上衣</SelectItem>
+                <SelectItem value="bottom">下身</SelectItem>
               </SelectContent>
             </Select>
 
@@ -468,9 +514,9 @@ export default function SearchPage() {
       {
         results.length === 0 && query !== "" &&
         <div className="w-full text-center">
-            很抱歉，暫時找不到符合您描述的商品 😢
-            <br />
-            試試調整搜尋描述或添加更多細節，讓我們幫您找到更適合的單品！
+          很抱歉，暫時找不到符合您描述的商品 😢
+          <br />
+          試試調整搜尋描述或添加更多細節，讓我們幫您找到更適合的單品！
         </div>
       }
     </div>

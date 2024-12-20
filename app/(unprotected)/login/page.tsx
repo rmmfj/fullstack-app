@@ -18,6 +18,7 @@ export default function Login() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
+        console.log('user?.id as string', user?.id as string);
         const profile = await getProfileByUserId(user?.id as string);
         toast({
           title: `嗨嗨，${profile.username}，歡迎回來啦！👋✨`,

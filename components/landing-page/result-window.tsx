@@ -4,21 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ResultWindowSkeleton from "./result-window-skeleton";
 
-{
-  /* TODO: Produce content for text search */
-}
 
-const TEXT_SEARCH_TABS = [];
-
-{
-  /* TODO: Produce content for image search */
-}
-
-const IMAGE_SEARCH_TABS = [];
-
-{
-  /* TODO: Produce content for recommendation */
-}
 const RECOMMENDATION_TABS = [
   [
     {

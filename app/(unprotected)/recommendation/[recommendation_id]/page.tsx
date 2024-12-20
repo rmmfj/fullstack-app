@@ -48,6 +48,9 @@ const RecommendationPage = async ({
           imageUrl={recommendation.imageUrl}
           gender={recommendation.gender}
         />
+        <Link href='/upload' className="underline cursor-pointer">
+          試試其他衣服
+        </Link>
       </div>
       <div className="flex flex-col gap-4 justify-center items-center md:max-w-[80vw]">
         {Object.keys(recommendation.styles).map((recommendedStyle, index) => {
