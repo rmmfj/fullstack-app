@@ -18,7 +18,7 @@ const PreviewList = ({
 
   return (
     <div
-      className="px-4 flex flex-col gap-6 items-center pt-6"
+      className="w-full px-4 flex flex-col gap-6 items-center pt-6"
     >
       <h3 className='text-2xl font-semibold text-primary border-b-2 border-indigo-400'>{title}</h3>
       {description && (

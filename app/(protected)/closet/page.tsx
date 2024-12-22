@@ -75,7 +75,7 @@ const ClosetPage = async () => {
       <div className='flex w-full gap-2'>{!favorites ? (
         <ItemListSkeleton index={0} />
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="w-full flex flex-col gap-8">
           <ItemList
             title='我的最愛'
             description={getRandomQuote()}
